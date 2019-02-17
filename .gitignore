@@ -1,0 +1,8 @@
+.idea
+package-lock.json
+nohup.out
+.eth/nohup.out
+coverage/
+coverage.lcov
+.nyc_output
+pid.txt

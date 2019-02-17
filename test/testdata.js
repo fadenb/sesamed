@@ -1,0 +1,35 @@
+var testData = [
+    {
+        "publicKey": "-----BEGIN PGP PUBLIC KEY BLOCK-----\r\nVersion: OpenPGP.js v4.4.7\r\nComment: https://openpgpjs.org\r\n\r\nxjMEXGBIdBYJKwYBBAHaRw8BAQdABfpiXQt0uWYYSFS4HccwzzIWfjargdIb\r\n6aS6vaHmXxnNBkpvY2hlbsJ3BBAWCgAfBQJcYEh0BgsJBwgDAgQVCAoCAxYC\r\nAQIZAQIbAwIeAQAKCRC8ZVPUbhk7PjjQAP9CUrPtEWrXifJDWpLolbtbLewL\r\n5zGxewsgFhHCD69DlAEAxehFIxKri0Hltb8K+lxzAdSB321e1HXILpc78cUN\r\nDgbOOARcYEh0EgorBgEEAZdVAQUBAQdAdeaZ9u7+eejmCW1Skp8q9nrI/PY/\r\n8jLDmy+hEy6LI0EDAQgHwmEEGBYIAAkFAlxgSHQCGwwACgkQvGVT1G4ZOz7q\r\nLAEA+hSJFUYQ86jSrcRSqQYFvYRi6O4r9NR71LgTjpmdHf4BAMFnxdcGGv85\r\nYrx4CBX+YKziHLZOHHFP0ELkc90fjL8L\r\n=ur/5\r\n-----END PGP PUBLIC KEY BLOCK-----\r\n",
+        "privateKey": "-----BEGIN PGP PRIVATE KEY BLOCK-----\r\nVersion: OpenPGP.js v4.4.7\r\nComment: https://openpgpjs.org\r\n\r\nxYYEXGBIdBYJKwYBBAHaRw8BAQdABfpiXQt0uWYYSFS4HccwzzIWfjargdIb\r\n6aS6vaHmXxn+CQMIFed1vnOv+E3geqU2WniQ5S0Kq05/AClho2rzFaPNRlox\r\nnwyRW59FSWfehAvAN9Q17AzTJYhyeOFJvrdqrRc7OirTXnJU5Jw77OtBdBFk\r\nIc0GSm9jaGVuwncEEBYKAB8FAlxgSHQGCwkHCAMCBBUICgIDFgIBAhkBAhsD\r\nAh4BAAoJELxlU9RuGTs+ONAA/0JSs+0RateJ8kNakuiVu1st7AvnMbF7CyAW\r\nEcIPr0OUAQDF6EUjEquLQeW1vwr6XHMB1IHfbV7UdcgulzvxxQ0OBseLBFxg\r\nSHQSCisGAQQBl1UBBQEBB0B15pn27v556OYJbVKSnyr2esj89j/yMsObL6ET\r\nLosjQQMBCAf+CQMIgajb6oIywlrgzMDQyehIikmRB9ta8x4Ut8s0KW1uhyJA\r\nCO4lqtj4Q+TPmhR+RPiJKzU69hwO74LkJQtbEqLefXDiswl0YjeXhD45kmpH\r\n9MJhBBgWCAAJBQJcYEh0AhsMAAoJELxlU9RuGTs+6iwBAPoUiRVGEPOo0q3E\r\nUqkGBb2EYujuK/TUe9S4E46ZnR3+AQDBZ8XXBhr/OWK8eAgV/mCs4hy2Thxx\r\nT9BC5HPdH4y/Cw==\r\n=r+Fq\r\n-----END PGP PRIVATE KEY BLOCK-----\r\n",
+        "passphrase": "passphrase",
+        "cleartext": "I am a cleartext.",
+        "ciphertext": "-----BEGIN PGP MESSAGE-----\nVersion: OpenPGP.js v4.4.7\nComment: https://openpgpjs.org\n\nwV4Dbnp83JALN2ASAQdAmUUsEh/d0W4l7VkhBk+l9GMshR8LjYsIw9oaEmz0\nxTMwNQp13LAKhm9B/W4Oe/byo5WC+EnG8pG7GQdnm4cYwO78KrDHQGUUIPqz\nc4bssQMT0kkB9ZDoZpqgauGlKObT6oMmOQSHceClCJqru4TpdnFr4kYbHz+9\nHc/cCCcNx6tI9bbOh/lerQeTaCeAW11hJ0b72XSZeqMfhoUw\n=0RTw\n-----END PGP MESSAGE-----\r\n",
+        "ciphertextSignedWith1": "-----BEGIN PGP MESSAGE-----\nVersion: OpenPGP.js v4.4.7\nComment: https://openpgpjs.org\n\nwV4Dbnp83JALN2ASAQdAz/2vCQcgHPe9q9xT9O8p+zqjkoWvgyW19nmShVYB\nR1IwE+szsuB52T1g7E/OkekkkpddDqvWoYflxNfwla0eliVakMy9U8Zo/gle\nlr+a+Vmk0rgBW+2UbYhfEghIuN9VYSzzlxD8VnkrJic7K5b5d58edV0Jpw29\nJhpzui8DeNGH/x9h5NZwVpPShjsAa0+tkJY+rv9u0J5O/71SHTj7+5f00qZR\nxW0lShyEmQG0He+KD2KML3tC56uQ13wTORuHyk+fixbBwrehZfZOFQxhlAdz\nzl4OZl/1oWCusuVmeGrsK3xyaSmPU3GhoONS0GolMxVlvgx1uTviNKrBtag3\nYWHnbAHNFrBGgSaa\n=1r8P\n-----END PGP MESSAGE-----\n\n",
+        "ciphertextFor0and1signedWith2": "-----BEGIN PGP MESSAGE-----\nVersion: OpenPGP.js v4.4.7\nComment: https://openpgpjs.org\n\nwV4Dbnp83JALN2ASAQdAYOc/8aeMg2O9N+HjQ7pVCWeBvcaoX2AWHbY2usF0\naEYw2WxhrrmRCBZWzIY/g8mQgo77/R+uPeyX5LBOtOnnM5bWICg0dfFBW1ju\nsvNzCOXKwV4DSMbn20iCppMSAQdAFbYe+IPVUEDViP+oQumpU8xC9kOF46/L\nlDRMlNLACGQw6xkP0yaT36rYNgm0UwTxyvaVUm3oOkeDiyqQN/FGxLXZAAvv\ngIGGbyjmToWuF0xH0rwBJ2FArVTb4jYw5tp2bBxRhHu7E5+A/KQUUrJPxFYA\ntI9RpDbCZuuMuUCbz7VG3NQQDUKgT9y1XYTIqadgD9aT/FwV5MSW4wRrU/hz\nqOKkVpAFT7XjBh4KLY3aTlG+vmegbHLNYyC93H/BHuu2vidg0DR6lSOPaEly\nXQOlNIVBUdhU0qLF2aB1Fqq7oFyBPimKyH0+tSn7zTtKCHbQByVlK3kVSYx5\nxeoNTpS8iEomFMUPnvX+46akOvRfGw==\n=qDtk\n-----END PGP MESSAGE-----\n\n",
+        "aesKey": "t7oE4TUt7UOvjvzH-vJ4aPDP-BCrGM548pD9gPeLCBE",
+        "aesCiphertext": "AAAGAmPiHCyiW1GExt+JCJ5ktPgesPbw6VD/zTt3eFgOpJEgtagNTm+KOeGqo3c4A4F+",
+        "ipfsHash": "QmS54VVbSuvBnCPaZLXrfTRLtF8KHhWsBSpTCS2J4BaCW9",
+        "multihash": {
+            "digest": "0x37705883cc57601fa74fd8f67886ec3a224a6c0d7e48a145df8433d258d8358e",
+            "hashFunction": 18,
+            "size": 32
+        }
+    },
+    {
+        "publicKey": "-----BEGIN PGP PUBLIC KEY BLOCK-----\r\nVersion: OpenPGP.js v4.4.7\r\nComment: https://openpgpjs.org\r\n\r\nxjMEXGBIdRYJKwYBBAHaRw8BAQdAcH1pANmvdlnss3RY1pS80l+LOUZAn08n\r\njdarE0VK3vvNA0phbsJ3BBAWCgAfBQJcYEh1BgsJBwgDAgQVCAoCAxYCAQIZ\r\nAQIbAwIeAQAKCRCr9BJDpozWW9VsAQC5renxI1R/kuI44t2t/j8mXMDh+uGd\r\nQrV9DLChFnT0FwD9HvVZ3zyJje+3PHPuQSvnP3Lkl0/V1qtkz/Mqk55DpAzO\r\nOARcYEh1EgorBgEEAZdVAQUBAQdAS1/AuncdGiZNUtU1Kz2cf2WrJqdkyKlr\r\nkur2HoLubQ0DAQgHwmEEGBYIAAkFAlxgSHUCGwwACgkQq/QSQ6aM1lvocgD5\r\nAAUZ1CPCZkglhT8bZrpqEZBHgKsc0bAx88hcd8TlOIoA/1c4SglyW0hlxuYx\r\n2Iy+cFlusKPqC3fUzctrTHki7eYM\r\n=P1ae\r\n-----END PGP PUBLIC KEY BLOCK-----\r\n",
+        "privateKey": "-----BEGIN PGP PRIVATE KEY BLOCK-----\r\nVersion: OpenPGP.js v4.4.7\r\nComment: https://openpgpjs.org\r\n\r\nxYYEXGBIdRYJKwYBBAHaRw8BAQdAcH1pANmvdlnss3RY1pS80l+LOUZAn08n\r\njdarE0VK3vv+CQMIpSnBX2Zsk0TgzRjUoQkij3Yy43tu1vZbs3OzBhmv0ilZ\r\nfG/OMUqyo8khfPpbIUpyPfvdnvMcD2jCg5Ak/SkgjqmdAM87Sa36uMIt7CWT\r\nKs0DSmFuwncEEBYKAB8FAlxgSHUGCwkHCAMCBBUICgIDFgIBAhkBAhsDAh4B\r\nAAoJEKv0EkOmjNZb1WwBALmt6fEjVH+S4jji3a3+PyZcwOH64Z1CtX0MsKEW\r\ndPQXAP0e9VnfPImN77c8c+5BK+c/cuSXT9XWq2TP8yqTnkOkDMeLBFxgSHUS\r\nCisGAQQBl1UBBQEBB0BLX8C6dx0aJk1S1TUrPZx/Zasmp2TIqWuS6vYegu5t\r\nDQMBCAf+CQMIUpD1Oqu3eHngfJLapNzqBtGvKBqAJSuhKfgp4E9vp/3YVxmO\r\nxPUeFjZki0OJWeVLXVsS3VxAFkbgEbyWZ5ruNdRkKoBT/ho11GakO+IeVMJh\r\nBBgWCAAJBQJcYEh1AhsMAAoJEKv0EkOmjNZb6HIA+QAFGdQjwmZIJYU/G2a6\r\nahGQR4CrHNGwMfPIXHfE5TiKAP9XOEoJcltIZcbmMdiMvnBZbrCj6gt31M3L\r\na0x5Iu3mDA==\r\n=gnDQ\r\n-----END PGP PRIVATE KEY BLOCK-----\r\n",
+        "passphrase": "passphrase",
+        "cleartext": "I am a cleartext of 1."
+    },
+    {
+        "publicKey": "-----BEGIN PGP PUBLIC KEY BLOCK-----\r\nVersion: OpenPGP.js v4.4.7\r\nComment: https://openpgpjs.org\r\n\r\nxjMEXGBIdRYJKwYBBAHaRw8BAQdAhwHILblo3Xq2zGuoZJ9UZg9SqfcbMAMb\r\n7BquK2hdrFXNBEthdHnCdwQQFgoAHwUCXGBIdQYLCQcIAwIEFQgKAgMWAgEC\r\nGQECGwMCHgEACgkQHHTQiIrT+MDQdAEA57m9EnzPstLhltriDA7h2VDr476B\r\nfZkezvMhW6WMBjUA/2mF+cU9w8shlrWMyJWVMYFbUwIlQv0FLKeBo4IV/58B\r\nzjgEXGBIdRIKKwYBBAGXVQEFAQEHQPz3mJSXscEXaUWNYD2QypTqA/IzBvQa\r\nkt7EAYHQSsIOAwEIB8JhBBgWCAAJBQJcYEh1AhsMAAoJEBx00IiK0/jAnHYA\r\n/0Dl/kJA4tLWVjlX2JdXCVHeYKgyF3sMvO/W/iW9aseFAQDaq4XJi7WT7OVs\r\ns9gRNXvbaPKqbeEUIpzJZOnQwTRMBg==\r\n=l2ZW\r\n-----END PGP PUBLIC KEY BLOCK-----\r\n",
+        "privateKey": "-----BEGIN PGP PRIVATE KEY BLOCK-----\r\nVersion: OpenPGP.js v4.4.7\r\nComment: https://openpgpjs.org\r\n\r\nxYYEXGBIdRYJKwYBBAHaRw8BAQdAhwHILblo3Xq2zGuoZJ9UZg9SqfcbMAMb\r\n7BquK2hdrFX+CQMIQnO1upIyE5TgAy35qDyZisosPFGhPWRWSq7ldqieeVAN\r\nbSqD4hLZyOETlOZucggEq7RKh+OwZnFTe294k/4tFK9yrD4eUzkyjZhoGEdJ\r\nPM0ES2F0ecJ3BBAWCgAfBQJcYEh1BgsJBwgDAgQVCAoCAxYCAQIZAQIbAwIe\r\nAQAKCRAcdNCIitP4wNB0AQDnub0SfM+y0uGW2uIMDuHZUOvjvoF9mR7O8yFb\r\npYwGNQD/aYX5xT3DyyGWtYzIlZUxgVtTAiVC/QUsp4GjghX/nwHHiwRcYEh1\r\nEgorBgEEAZdVAQUBAQdA/PeYlJexwRdpRY1gPZDKlOoD8jMG9BqS3sQBgdBK\r\nwg4DAQgH/gkDCGUl9cfU7Pyj4BYHbomoyeY0fn0J/rNxD1HO8BLfG0Ihvajl\r\ntK2GGcwPayjIGxnsurySegPiPemgRI7npmYEu4mVRgs2rkxcreCeZB5Fw+3C\r\nYQQYFggACQUCXGBIdQIbDAAKCRAcdNCIitP4wJx2AP9A5f5CQOLS1lY5V9iX\r\nVwlR3mCoMhd7DLzv1v4lvWrHhQEA2quFyYu1k+zlbLPYETV722jyqm3hFCKc\r\nyWTp0ME0TAY=\r\n=bnA9\r\n-----END PGP PRIVATE KEY BLOCK-----\r\n",
+        "passphrase": "passphrase",
+        "cleartext": "I am a cleartext of 2"
+    }
+];
+
+if (typeof window === "undefined") {
+    exports.testData = testData;
+}
