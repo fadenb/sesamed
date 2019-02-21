@@ -15,7 +15,7 @@ if (typeof window === "undefined") {
     var sandbox;
 }
 
-var ethers = sesamed.ethers;
+var ethers = sesamed._ethers;
 var pgp = sesamed.pgp;
 
 describe("sesamed", async function () {

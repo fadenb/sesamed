@@ -184,7 +184,8 @@ var sesamed = {
     pgp: pgp,
     aes: aes,
     multihash: multihash,
-    ethers: ethers
+    // for testing only
+    _ethers: ethers
 };
 
 if (typeof window !== "undefined") {
