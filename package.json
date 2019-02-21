@@ -1,0 +1,70 @@
+{
+  "name": "sesamed",
+  "main": "src/sesamed.js",
+  "scripts": {
+    "test": "npx nyc mocha",
+    "cover": "npx nyc --reporter=html --reporter=text mocha",
+    "compile": "cd eth && npx truffle compile",
+    "codecov": "npx codecov ",
+    "testContracts": "cd eth && sh waitForGanache.sh && npx truffle test test/contracts.test.js",
+    "lint": "npx eslint src test eth/migrations eth/test",
+    "browserify": "npx browserify src/sesamed.js -o dist/sesamed.js && npx browserify test/browserify/browserify_devlibs.js -o test/browserify/devlibs.js",
+    "docs": "npx jsdoc2md --property-list-format list --param-list-format list -t jsdoc2md/README.hbs src/*.js > README.md; echo",
+    "report-cover": "npx nyc report --reporter=text-lcov > coverage.lcov && npx codecov"
+  },
+  "version": "0.0.2",
+  "author": {
+    "name": "RED Medical Systems GmbH",
+    "email": "info@redmedical.de",
+    "url": "https://www.redmedical.de"
+  },
+  "bugs": {
+    "url": "https://github.com/redmedical/sesamed/issues"
+  },
+  "description": "Blockchain for the Healthcare System",
+  "homepage": "https://github.com/redmedical/sesamed",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/redmedical/sesamed.git"
+  },
+  "browser": {
+    "openpgp": "openpgp/dist/openpgp.min.js"
+  },
+  "keywords": [
+    "ethereum",
+    "blockchain",
+    "healthcare",
+    "privacy",
+    "communication"
+  ],
+  "devDependencies": {
+    "browserify": "^16.2.3",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "codecov": "^3.2.0",
+    "eslint": "^5.14.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "ganache-cli": "^6.3.0",
+    "jsdoc-to-markdown": "^4.0.1",
+    "mocha": "^4.1.0",
+    "nyc": "^13.3.0",
+    "sinon": "^7.2.3",
+    "sinon-chai": "^3.3.0",
+    "truffle": "^5.0.4",
+    "truffle-assertions": "^0.8.0"
+  },
+  "dependencies": {
+    "@trust/webcrypto": "^0.9.2",
+    "base64-arraybuffer": "^0.1.5",
+    "bs58": "^4.0.1",
+    "butternut": "^0.4.6",
+    "ethers": "^4.0.25",
+    "ipfs-mini": "^1.1.5",
+    "openpgp": "^4.4.7"
+  }
+}
