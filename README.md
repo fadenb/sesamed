@@ -1,8 +1,8 @@
 [![view on npm](http://img.shields.io/npm/v/sesamed.svg)](https://www.npmjs.org/package/sesamed)
 [![npm module downloads](http://img.shields.io/npm/dt/sesamed.svg)](https://www.npmjs.org/package/sesamed)
-[![codecov](https://codecov.io/gh/redmedical/sesamed/branch/develop/graph/badge.svg)](https://codecov.io/gh/redmedical/sesamed)
-[![Build Status](https://travis-ci.org/redmedical/sesamed.svg?branch=develop)](https://travis-ci.org/redmedical/sesamed)
-[![Dependency Status](https://david-dm.org/redmedical/sesamed.svg)](https://david-dm.org/redmedical/sesamed/develop)
+[![codecov](https://codecov.io/gh/redmedical/sesamed/branch/master/graph/badge.svg)](https://codecov.io/gh/redmedical/sesamed)
+[![Build Status](https://travis-ci.org/redmedical/sesamed.svg?branch=master)](https://travis-ci.org/redmedical/sesamed)
+[![Dependency Status](https://david-dm.org/redmedical/sesamed.svg)](https://david-dm.org/redmedical/sesamed)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](https://github.com/feross/standard)
 [![Join the chat at https://gitter.im/redmedcical/sesamed](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/redmedical/sesamed?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -59,9 +59,14 @@ const sesamed = require("sesamed")
     
 * [sesamed.aes](#module_sesamed.aes)
     * [.generateKey()](#module_sesamed.aes.generateKey) ⇒ <code>Promise</code>
-    * [.importKey(keydata)](#module_sesamed.aes.importKey) ⇒ <code>Promise</code>
+    * [.importKey(key)](#module_sesamed.aes.importKey) ⇒ <code>Promise</code>
     * [.encrypt(key, cleartext)](#module_sesamed.aes.encrypt) ⇒ <code>Promise</code>
-    * [.decrypt(key, cleartext)](#module_sesamed.aes.decrypt) ⇒ <code>Promise</code>
+    * [.decrypt(key, ciphertext)](#module_sesamed.aes.decrypt) ⇒ <code>Promise</code>
+
+    
+* [sesamed.ipfs](#module_sesamed.ipfs)
+    * [.write(data)](#module_sesamed.ipfs.write) ⇒ <code>Promise</code>
+    * [.read(fileHash)](#module_sesamed.ipfs.read) ⇒ <code>Promise</code>
 
     
 * [sesamed.multihash](#module_sesamed.multihash)
@@ -137,7 +142,11 @@ creates a new account and sets
 
 **Example**  
 ```js
-sesamed.createAccount()
+> sesamed.createAccount()
+{
+    wallet: {},
+    pgp: {}
+}
 ```
 <a name="module_sesamed.register"></a>
 
@@ -208,7 +217,7 @@ Returns a base64 encoded AES key
 **Reject**: <code>Error</code> - this should not happen  
 <a name="module_sesamed.aes.importKey"></a>
 
-### sesamed.aes.importKey(keydata) ⇒ <code>Promise</code>
+### sesamed.aes.importKey(key) ⇒ <code>Promise</code>
 imports a base64 encoded key into a CryptoKey
 
 **Kind**: static method of [<code>sesamed.aes</code>](#module_sesamed.aes)  
@@ -216,7 +225,7 @@ imports a base64 encoded key into a CryptoKey
 **Reject**: <code>Error</code>  
 **Params**
 
-- keydata <code>string</code> - the base64 encoded AES key
+- key <code>string</code> - the base64 encoded AES key
 
 <a name="module_sesamed.aes.encrypt"></a>
 
@@ -233,7 +242,7 @@ AES-encrypts cleartext to cyphertext with the given key
 
 <a name="module_sesamed.aes.decrypt"></a>
 
-### sesamed.aes.decrypt(key, cleartext) ⇒ <code>Promise</code>
+### sesamed.aes.decrypt(key, ciphertext) ⇒ <code>Promise</code>
 AES-decryptfs cyphertext to cleartext with the given key
 
 **Kind**: static method of [<code>sesamed.aes</code>](#module_sesamed.aes)  
@@ -242,7 +251,31 @@ AES-decryptfs cyphertext to cleartext with the given key
 **Params**
 
 - key <code>String</code>
-- cleartext <code>String</code>
+- ciphertext <code>String</code>
+
+    <a name="module_sesamed.ipfs.write"></a>
+
+### sesamed.ipfs.write(data) ⇒ <code>Promise</code>
+Writes data to the ipfs
+
+**Kind**: static method of [<code>sesamed.ipfs</code>](#module_sesamed.ipfs)  
+**Fulfil**: <code>string</code> fileHash  
+**Reject**: <code>Error</code>  
+**Params**
+
+- data <code>String</code> - the data to be written
+
+<a name="module_sesamed.ipfs.read"></a>
+
+### sesamed.ipfs.read(fileHash) ⇒ <code>Promise</code>
+Reads data from the ipfs
+
+**Kind**: static method of [<code>sesamed.ipfs</code>](#module_sesamed.ipfs)  
+**Fulfil**: <code>string</code> data - the data which has been read  
+**Reject**: <code>Error</code>  
+**Params**
+
+- fileHash <code>String</code> - the ipfs fileHash
 
     <a name="module_sesamed.multihash.getMultihashFromBase58"></a>
 
