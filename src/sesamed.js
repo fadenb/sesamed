@@ -8,6 +8,7 @@ const ethers = require ("ethers");
 // local modules
 const pgp = require("./pgp");
 const aes = require("./aes");
+const ipfs = require("./ipfs");
 const multihash = require("./multihash");
 
 // contract json
@@ -183,8 +184,10 @@ var sesamed = {
     getNewAccounts: getNewAccounts,
     pgp: pgp,
     aes: aes,
+    ipfs: ipfs,
     multihash: multihash,
-    ethers: ethers
+    // for testing only
+    _ethers: ethers
 };
 
 if (typeof window !== "undefined") {

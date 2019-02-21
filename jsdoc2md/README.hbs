@@ -1,8 +1,8 @@
 [![view on npm](http://img.shields.io/npm/v/sesamed.svg)](https://www.npmjs.org/package/sesamed)
 [![npm module downloads](http://img.shields.io/npm/dt/sesamed.svg)](https://www.npmjs.org/package/sesamed)
-[![codecov](https://codecov.io/gh/redmedical/sesamed/branch/develop/graph/badge.svg)](https://codecov.io/gh/redmedical/sesamed)
-[![Build Status](https://travis-ci.org/redmedical/sesamed.svg?branch=develop)](https://travis-ci.org/redmedical/sesamed)
-[![Dependency Status](https://david-dm.org/redmedical/sesamed.svg)](https://david-dm.org/redmedical/sesamed/develop)
+[![codecov](https://codecov.io/gh/redmedical/sesamed/branch/master/graph/badge.svg)](https://codecov.io/gh/redmedical/sesamed)
+[![Build Status](https://travis-ci.org/redmedical/sesamed.svg?branch=master)](https://travis-ci.org/redmedical/sesamed)
+[![Dependency Status](https://david-dm.org/redmedical/sesamed.svg)](https://david-dm.org/redmedical/sesamed)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](https://github.com/feross/standard)
 [![Join the chat at https://gitter.im/redmedcical/sesamed](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/redmedical/sesamed?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -44,6 +44,10 @@ npm install --save sesamed
     {{>body~}}
     {{>member-index~}}
 {{/module}}
+{{#module name="sesamed.ipfs"}}
+    {{>body~}}
+    {{>member-index~}}
+{{/module}}
 {{#module name="sesamed.multihash"}}
     {{>body~}}
     {{>member-index~}}
@@ -57,6 +61,10 @@ npm install --save sesamed
     {{>members~}}
 {{/module}}
 {{#module name="sesamed.aes"}}
+    {{>separator~}}
+    {{>members~}}
+{{/module}}
+{{#module name="sesamed.ipfs"}}
     {{>separator~}}
     {{>members~}}
 {{/module}}
