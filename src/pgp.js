@@ -15,7 +15,7 @@ const openpgp = require("openpgp");
  * @param {String} options.userIds.email
  * @param {String} options.passphrase
  * @returns {Promise}
- * @fulfil {PgpKeys} pgpKeys
+ * @resolve {PgpKeys} pgpKeys
  * @reject {Error}
  */
 function generateKeys(options) {
@@ -44,7 +44,7 @@ function generateKeys(options) {
  * @param {String} options.passphrase
  * @param {String} options.cleartext
  * @returns {Promise}
- * @fulfil {string} ciphertext
+ * @resolve {string} ciphertext
  * @reject {Error}
  */
 async function encrypt(options) {
@@ -84,7 +84,7 @@ async function encrypt(options) {
  * @param {String} [options.publicKey]
  * @param {String} options.ciphertext
  * @returns {Promise}
- * @fulfil {string} cleartext
+ * @resolve {string} cleartext
  * @reject {Error}
  */
 async function decrypt(options) {

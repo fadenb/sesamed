@@ -48,6 +48,7 @@ const sesamed = require("sesamed")
     * _static_
         * [.init(options)](#module_sesamed.init)
         * [.createAccount(options)](#module_sesamed.createAccount) ⇒ [<code>Account</code>](#Account)
+        * [.setAccount(account)](#module_sesamed.setAccount)
         * [.register(name, publicPgpKey)](#module_sesamed.register) ⇒ <code>Promise</code>
 
     
@@ -122,8 +123,7 @@ Initializes the configuration
 
 - options <code>Object</code>
     - .accountContractAddress <code>String</code>
-    - .rpc <code>String</code>
-    - .privateKey <code>String</code>
+    - .rpcUrl <code>String</code>
 
 <a name="module_sesamed.createAccount"></a>
 
@@ -148,6 +148,16 @@ creates a new account and sets
     pgp: {}
 }
 ```
+<a name="module_sesamed.setAccount"></a>
+
+### sesamed.setAccount(account)
+sets an account to be used by sesamed
+
+**Kind**: static method of [<code>sesamed</code>](#module_sesamed)  
+**Params**
+
+- account [<code>Account</code>](#Account)
+
 <a name="module_sesamed.register"></a>
 
 ### sesamed.register(name, publicPgpKey) ⇒ <code>Promise</code>
@@ -165,7 +175,7 @@ Registers a new account
 Creates a new pgp key pair
 
 **Kind**: static method of [<code>sesamed.pgp</code>](#module_sesamed.pgp)  
-**Fulfil**: [<code>PgpKeys</code>](#PgpKeys) pgpKeys  
+**Resolve**: [<code>PgpKeys</code>](#PgpKeys) pgpKeys  
 **Reject**: <code>Error</code>  
 **Params**
 
@@ -181,7 +191,7 @@ Creates a new pgp key pair
 Encrypts data with public key and signs if private key is provided
 
 **Kind**: static method of [<code>sesamed.pgp</code>](#module_sesamed.pgp)  
-**Fulfil**: <code>string</code> ciphertext  
+**Resolve**: <code>string</code> ciphertext  
 **Reject**: <code>Error</code>  
 **Params**
 
@@ -197,7 +207,7 @@ Encrypts data with public key and signs if private key is provided
 Decrypts data with private key and checks signature if public key is provided
 
 **Kind**: static method of [<code>sesamed.pgp</code>](#module_sesamed.pgp)  
-**Fulfil**: <code>string</code> cleartext  
+**Resolve**: <code>string</code> cleartext  
 **Reject**: <code>Error</code>  
 **Params**
 
@@ -213,7 +223,7 @@ Decrypts data with private key and checks signature if public key is provided
 Returns a base64 encoded AES key
 
 **Kind**: static method of [<code>sesamed.aes</code>](#module_sesamed.aes)  
-**Fulfil**: <code>string</code> key - a base64 encoded AES key  
+**Resolve**: <code>String</code> key - a base64 encoded AES key  
 **Reject**: <code>Error</code> - this should not happen  
 <a name="module_sesamed.aes.importKey"></a>
 
@@ -221,7 +231,7 @@ Returns a base64 encoded AES key
 imports a base64 encoded key into a CryptoKey
 
 **Kind**: static method of [<code>sesamed.aes</code>](#module_sesamed.aes)  
-**Fulfil**: <code>CryptoKey</code>  
+**Resolve**: <code>CryptoKey</code>  
 **Reject**: <code>Error</code>  
 **Params**
 
@@ -233,7 +243,7 @@ imports a base64 encoded key into a CryptoKey
 AES-encrypts cleartext to cyphertext with the given key
 
 **Kind**: static method of [<code>sesamed.aes</code>](#module_sesamed.aes)  
-**Fulfil**: <code>string</code> ciphertext - the base64 encoded ciphertext  
+**Resolve**: <code>string</code> ciphertext - the base64 encoded ciphertext  
 **Reject**: <code>Error</code>  
 **Params**
 
@@ -246,7 +256,7 @@ AES-encrypts cleartext to cyphertext with the given key
 AES-decryptfs cyphertext to cleartext with the given key
 
 **Kind**: static method of [<code>sesamed.aes</code>](#module_sesamed.aes)  
-**Fulfil**: <code>String</code> ciphertext - the base64 encoded ciphertext  
+**Resolve**: <code>String</code> ciphertext - the base64 encoded ciphertext  
 **Reject**: <code>Error</code>  
 **Params**
 
@@ -259,7 +269,7 @@ AES-decryptfs cyphertext to cleartext with the given key
 Writes data to the ipfs
 
 **Kind**: static method of [<code>sesamed.ipfs</code>](#module_sesamed.ipfs)  
-**Fulfil**: <code>string</code> fileHash  
+**Resolve**: <code>String</code> fileHash  
 **Reject**: <code>Error</code>  
 **Params**
 
@@ -271,7 +281,7 @@ Writes data to the ipfs
 Reads data from the ipfs
 
 **Kind**: static method of [<code>sesamed.ipfs</code>](#module_sesamed.ipfs)  
-**Fulfil**: <code>string</code> data - the data which has been read  
+**Resolve**: <code>String</code> data - the data which has been read  
 **Reject**: <code>Error</code>  
 **Params**
 

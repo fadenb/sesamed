@@ -17,7 +17,7 @@ const ipfs = new IPFS({host: "ipfs.infura.io", port: 5001, protocol: "https"});
  * @memberof module:"sesamed.ipfs"
  * @param {String} data - the data to be written
  * @returns {Promise}
- * @fulfil {string} fileHash
+ * @resolve {String} fileHash
  * @reject {Error}
  */
 function write(data) {
@@ -31,7 +31,7 @@ function write(data) {
  * @memberof module:"sesamed.ipfs"
  * @param {String} fileHash - the ipfs fileHash
  * @returns {Promise}
- * @fulfil {string} data - the data which has been read
+ * @resolve {String} data - the data which has been read
  * @reject {Error}
  */
 function read(fileHash) {
