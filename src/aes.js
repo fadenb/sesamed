@@ -1,7 +1,5 @@
 // crypto must not be declared with var, let or const due to browser compatibility
-if (typeof window === "undefined") {
-    crypto = require("@trust/webcrypto"); // eslint-disable-line no-global-assign
-}
+crypto = require("@trust/webcrypto"); // eslint-disable-line no-global-assign
 const base64ArrayBuffer = require("base64-arraybuffer");
 
 /**
