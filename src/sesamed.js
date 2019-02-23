@@ -75,22 +75,22 @@ function init(options) {
 
 /**
  * creates a new account and sets
- * @alias module:sesamed.createAccount
+ * @alias module:sesamed.getNewAccount
  * @param {String} name - the name of the account
  * @returns {Account} account
  * @example
  * ```js
- * > sesamed.createAccount()
+ * > sesamed.getNewAccount()
  * {
  *     wallet: {},
  *     pgp: {}
  * }
  * ```
  */
-async function createAccount(name) {
+async function getNewAccount(name) {
 
     if (typeof name !== "string" || !name) {
-        throw(new Error("createAccount: name missing"));
+        throw(new Error("getNewAccount: name missing"));
     }
     const mnemonic = await createMnemonic();
     const wallet = await createWalletFromMnemonic(mnemonic);
@@ -236,7 +236,7 @@ function getLogEntries(from, to, contractAddress, eventName, params, topic) {
 
 var sesamed = {
     init: init,
-    createAccount: createAccount,
+    getNewAccount: getNewAccount,
     setAccount: setAccount,
     registerAccount: registerAccount,
     getPublicKey: getPublicKey,

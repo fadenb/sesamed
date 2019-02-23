@@ -135,9 +135,9 @@ describe("sesamed", async function () {
 
     });
 
-    describe("createAccount", async function () {
+    describe("getNewAccount", async function () {
 
-        let err = "createAccount: name missing";
+        let err = "getNewAccount: name missing";
         testWallet = {
             signingKey: {
                 mnemonic: "mnemonic",
@@ -148,53 +148,53 @@ describe("sesamed", async function () {
         };
 
         it("should be a function", async function () {
-            expect(sesamed.createAccount).to.be.a("function");
+            expect(sesamed.getNewAccount).to.be.a("function");
         });
 
         it("should throw Error if name is missing", async function () {
-            return expect(sesamed.createAccount()).to.be.rejectedWith(err);
+            return expect(sesamed.getNewAccount()).to.be.rejectedWith(err);
         });
 
         it("should throw Error if name is empty", async function () {
-            return expect(sesamed.createAccount("")).to.be.rejectedWith(err);
+            return expect(sesamed.getNewAccount("")).to.be.rejectedWith(err);
         });
 
         it("should throw Error if name is no string", async function () {
-            return expect(sesamed.createAccount(1)).to.be.rejectedWith(err);
+            return expect(sesamed.getNewAccount(1)).to.be.rejectedWith(err);
         });
 
         it("should call ethers.utils.HDNode.entropyToMnemonic", async function () {
-            await sesamed.createAccount("alice");
+            await sesamed.getNewAccount("alice");
             return expect(stubbedEntropyToMnemonic).to.have.been.calledOnce;
         });
 
         it("should call pgp.createKeys", async function () {
-            await sesamed.createAccount("alice");
+            await sesamed.getNewAccount("alice");
             return expect(stubbedPgpGenerateKeys).to.have.been.calledOnce;
         });
 
         it("should call pgp.createKeys with name and mnemonic", async function () {
-            await sesamed.createAccount("alice");
+            await sesamed.getNewAccount("alice");
             return expect(stubbedPgpGenerateKeys).to.have.been.calledWith("alice", "mnemonic");
         });
 
         it("should return an object with a name", async function () {
-            let account = await sesamed.createAccount("alice");
+            let account = await sesamed.getNewAccount("alice");
             return expect(account.name).to.equal("alice");
         });
 
         it("should return an object with a mnemonic", async function () {
-            let account = await sesamed.createAccount("alice");
+            let account = await sesamed.getNewAccount("alice");
             return expect(account.mnemonic).to.equal("mnemonic");
         });
 
         it("should return an object with a privateKey", async function () {
-            let account = await sesamed.createAccount("alice");
+            let account = await sesamed.getNewAccount("alice");
             return expect(account.privateKey).to.equal("privateKey");
         });
 
         it("should return an object with an address", async function () {
-            let account = await sesamed.createAccount("alice");
+            let account = await sesamed.getNewAccount("alice");
             return expect(account.address).to.equal("address");
         });
 
@@ -276,7 +276,7 @@ describe("sesamed", async function () {
 
         beforeEach(async function () {
             sesamed.init();
-            await sesamed.setAccount(await sesamed.createAccount("alice"));
+            await sesamed.setAccount(await sesamed.getNewAccount("alice"));
         });
 
         it("should be a function", async function () {

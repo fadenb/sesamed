@@ -34,8 +34,8 @@ contract("Sesamed", function (accounts) {
     async function registerAccount(name) {
         let account;
 
-        it("sesamed.createAccount(" + name + ")", async function () {
-            account = await sesamed.createAccount(name);
+        it("sesamed.getNewAccount(" + name + ")", async function () {
+            account = await sesamed.getNewAccount(name);
         });
 
         it("sesamed.setAccount(" + name + ")", function () {
