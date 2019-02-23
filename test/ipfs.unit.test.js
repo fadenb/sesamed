@@ -25,7 +25,7 @@ describe("ipfs", function () {
             let data = await ipfs.read("fileHash");
 
             stubIpfsCat.should.have.been.calledWith("fileHash");
-            expect(data).to.equal("stubbedData");
+            return expect(data).to.equal("stubbedData");
         });
     });
 
@@ -40,7 +40,7 @@ describe("ipfs", function () {
             let fileHash = await ipfs.write("data");
 
             stubIpfsAdd.should.have.been.calledWith("data");
-            expect(fileHash).to.equal("stubbedFileHash");
+            return expect(fileHash).to.equal("stubbedFileHash");
         });
 
     });

@@ -7,6 +7,7 @@
     "compile": "cd eth && npx truffle compile",
     "codecov": "npx codecov ",
     "testContracts": "cd eth && sh waitForGanache.sh && npx truffle test test/contracts.test.js",
+    "testSesamed": "cd eth && sh waitForGanache.sh && npx truffle test test/sesamed.si.test.js",
     "lint": "npx eslint src test eth/migrations eth/test",
     "browserify": "npx browserify src/sesamed.js -o dist/sesamed.js && npx browserify test/browserify/browserify_devlibs.js -o test/browserify/devlibs.js",
     "docs": "npx jsdoc2md --property-list-format list --param-list-format list -t jsdoc2md/README.hbs src/*.js > README.md; echo",
