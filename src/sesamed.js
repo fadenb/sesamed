@@ -57,16 +57,28 @@ const accountContractJson = require("../eth/build/contracts/Account.json");
  * @property {String} publicKey - the public pgp key
  */
 
+/**
+ *
+ * @typedef {Object} IpfsGateway
+ * @alias IpfsGateway
+ * @memberof module:sesamed
+ * @property {String} host - the host address (i.e. "ipfs.infura.io")
+ * @properry {Numver} port - the gateway port (i.e. 5001)
+ * @property {String} protocol - "https" / "http"
+ */
+
 
 /**
  * Initializes the configuration
  * @alias module:sesamed.init
  * @param {Object} [options]
- * @param {String} options.accountContractAddress
- * @param {String} options.rpcUrl
+ * @param {String} [options.accountContractAddress] - the address of the account contract
+ * @param {String} [options.rpcUrl] - the url of the rpc provider
+ * @param {IpfsGateway} [options.ipfsGateway] - the ipfsGateway
  */
 function init(options) {
     options = options || {};
+    ipfs.setGateway(options.ipfsGateway || global.default.ipfsGateway);
     global.provider = new ethers.providers.JsonRpcProvider(options.rpcUrl || global.default.rpcUrl);
     let accountContractAddress = options.accountContractAddress || accountContractJson.networks[global.default.network].address;
     global.accountContract = new ethers.Contract(accountContractAddress, accountContractJson.abi, global.provider);
@@ -186,6 +198,15 @@ async function registerAccount() {
     return global.accountContract.register(global.name, ipfsHash, global.default.repo);
 }
 
+
+/**
+ * returns the public key of an Account
+ * @alias module:sesamed.getPublicKey
+ * @param {String} name - the name of the account
+ * @returns {Promise}
+ * @resolve {String} publicKey
+ * @reject {Error}
+ */
 async function getPublicKey(name) {
     let accounts = await getLogEntries(
         0,
@@ -256,10 +277,6 @@ if (typeof window !== "undefined") {
 /**
  * @module sesamed
  * @typicalname sesamed
- * @example
- * ```js
- * const sesamed = require("sesamed")
- * ```
  */
 
 module.exports = sesamed;

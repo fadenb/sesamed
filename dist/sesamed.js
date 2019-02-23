@@ -30319,7 +30319,7 @@ const base64ArrayBuffer = require("base64-arraybuffer");
  * Returns a base64 encoded AES key
  * @alias module:"sesamed.aes".generateKey
  * @returns {Promise}
- * @fulfil {string} key - a base64 encoded AES key
+ * @resolve {String} key - a base64 encoded AES key
  * @reject {Error} - this should not happen
  */
 async function generateKey() {
@@ -30343,7 +30343,7 @@ async function generateKey() {
  * @alias module:"sesamed.aes".importKey
  * @param {string} key - the base64 encoded AES key
  * @returns {Promise}
- * @fulfil {CryptoKey}
+ * @resolve {CryptoKey}
  * @reject {Error}
  */
 async function importKey(key) {
@@ -30369,7 +30369,7 @@ async function importKey(key) {
  * @param {String} key
  * @param {String} cleartext
  * @returns {Promise}
- * @fulfil {string} ciphertext - the base64 encoded ciphertext
+ * @resolve {string} ciphertext - the base64 encoded ciphertext
  * @reject {Error}
  */
 async function encrypt(key, cleartext) {
@@ -30398,7 +30398,7 @@ async function encrypt(key, cleartext) {
  * @param {String} key
  * @param {String} ciphertext
  * @returns {Promise}
- * @fulfil {String} ciphertext - the base64 encoded ciphertext
+ * @resolve {String} ciphertext - the base64 encoded ciphertext
  * @reject {Error}
  */
 async function decrypt(key, ciphertext) {
@@ -30448,17 +30448,60 @@ let aes = {
 module.exports = aes;
 }).call(this,require("buffer").Buffer)
 },{"@trust/webcrypto":18,"base64-arraybuffer":24,"buffer":58}],188:[function(require,module,exports){
+let provider,
+    privateKey,
+    publicKey,
+    name,
+    accountContract,
+    standard;
+
+standard = {
+    rpcUrl: "https://rpc.sesamed.de",
+    ipfsGateway: {host: "116.203.60.88", port: 5001, protocol: "http"},
+    network: "219",
+    repo: 1 // 1 = ipfs
+};
+
+
+
+module.exports = {
+    provider: provider,
+    privateKey: privateKey,
+    publicKey: publicKey,
+    name: name,
+    accountContract: accountContract,
+    default: standard
+};
+
+},{}],189:[function(require,module,exports){
 /**
  * @namespace ipfs
  * @memberOf sesamed
  */
 "use strict";
-// global npm packages
+
+// npm packages
 const IPFS = require("ipfs-mini");
 
-
 // the ipfs provider
-const ipfs = new IPFS({host: "ipfs.infura.io", port: 5001, protocol: "https"});
+let ipfs;
+
+/**
+ * sets the ipfs gateway
+ * @alias module:"sesamed.ipfs".setGateway
+ * @param {String} ipfsGateway
+ */
+function setGateway(ipfsGateway) {
+    if (!ipfsGateway || typeof ipfsGateway !== "object") {
+        throw new Error("setGateway: ipfsGateway is missing");
+    }
+
+    if (!ipfsGateway.host || !ipfsGateway.port || !ipfsGateway.protocol) {
+        throw new Error("setGateway: ipfsGateway incomplete");
+    }
+
+    ipfs = new IPFS(ipfsGateway);
+}
 
 
 /**
@@ -30467,7 +30510,7 @@ const ipfs = new IPFS({host: "ipfs.infura.io", port: 5001, protocol: "https"});
  * @memberof module:"sesamed.ipfs"
  * @param {String} data - the data to be written
  * @returns {Promise}
- * @fulfil {string} fileHash
+ * @resolve {String} fileHash
  * @reject {Error}
  */
 function write(data) {
@@ -30481,7 +30524,7 @@ function write(data) {
  * @memberof module:"sesamed.ipfs"
  * @param {String} fileHash - the ipfs fileHash
  * @returns {Promise}
- * @fulfil {string} data - the data which has been read
+ * @resolve {String} data - the data which has been read
  * @reject {Error}
  */
 function read(fileHash) {
@@ -30493,13 +30536,12 @@ function read(fileHash) {
  */
 
 module.exports = {
+    setGateway: setGateway,
     read: read,
     write: write,
-    // for testing only
-    _ipfs: ipfs
 };
 
-},{"ipfs-mini":112}],189:[function(require,module,exports){
+},{"ipfs-mini":112}],190:[function(require,module,exports){
 (function (Buffer){
 var bs58 = require("bs58");
 
@@ -30559,7 +30601,7 @@ let multihash = {
 
 module.exports = multihash;
 }).call(this,require("buffer").Buffer)
-},{"bs58":56,"buffer":58}],190:[function(require,module,exports){
+},{"bs58":56,"buffer":58}],191:[function(require,module,exports){
 /**
  * @namespace pgp
  * @memberOf sesamed
@@ -30571,20 +30613,21 @@ const openpgp = require("openpgp");
 /**
  * Creates a new pgp key pair
  * @alias module:sesamed.pgp.generateKeys
- * @param {Object} options
- * @param {Object} options.userIds
- * @param {String} options.userIds.name
- * @param {String} options.userIds.email
- * @param {String} options.passphrase
+ * @param {String} name - the name associated with the pgp keys
+ * @param {String} passphrase - the passphrase protecting the private key
  * @returns {Promise}
- * @fulfil {PgpKeys} pgpKeys
+ * @resolve {PgpKeys} pgpKeys
  * @reject {Error}
  */
-function generateKeys(options) {
+function generateKeys(name, passphrase) {
+    if (!name || !passphrase || typeof name !== "string" || typeof passphrase !== "string") {
+        throw(new Error("pgp.generateKeys: missing name or passphrase"));
+    }
+
     return openpgp.generateKey({
-        userIds: options.userIds,
+        userIds: {name: name},
         curve: "ed25519",
-        passphrase: options.passphrase
+        passphrase: passphrase
     }).then(key => {
         let privateKey = key.privateKeyArmored,
             publicKey = key.publicKeyArmored;
@@ -30597,6 +30640,22 @@ function generateKeys(options) {
 }
 
 /**
+ * returns a the publicKey from a privateKey and a passphrase
+ * @alias module:"sesamed.pgp".getPublicKeyFromPrivateKey
+ * @param {String} privateKey
+ * @param {String} passphrase
+ * @returns {Promise}
+ * @resolve {String} publicKey
+ * @reject {Error}
+ */
+async function getPublicKeyFromPrivateKey(privateKey, passphrase) {
+    let privateKeyObj = (await openpgp.key.readArmored(privateKey)).keys[0];
+    privateKeyObj.decrypt(passphrase);
+    let publicKey = privateKeyObj.toPublic().armor();
+    return publicKey;
+}
+
+/**
  * Encrypts data with public key and signs if private key is provided
  * @alias module:"sesamed.pgp".encrypt
  * @memberof module:"sesamed.pgp"
@@ -30606,7 +30665,7 @@ function generateKeys(options) {
  * @param {String} options.passphrase
  * @param {String} options.cleartext
  * @returns {Promise}
- * @fulfil {string} ciphertext
+ * @resolve {string} ciphertext
  * @reject {Error}
  */
 async function encrypt(options) {
@@ -30646,7 +30705,7 @@ async function encrypt(options) {
  * @param {String} [options.publicKey]
  * @param {String} options.ciphertext
  * @returns {Promise}
- * @fulfil {string} cleartext
+ * @resolve {string} cleartext
  * @reject {Error}
  */
 async function decrypt(options) {
@@ -30681,13 +30740,14 @@ async function decrypt(options) {
 
 let pgp = {
     generateKeys: generateKeys,
+    getPublicKeyFromPrivateKey: getPublicKeyFromPrivateKey,
     encrypt: encrypt,
     decrypt: decrypt
 };
 
 module.exports = pgp;
 
-},{"openpgp":120}],191:[function(require,module,exports){
+},{"openpgp":120}],192:[function(require,module,exports){
 /**
  *  @namespace sesamed
  */
@@ -30700,28 +30760,30 @@ const pgp = require("./pgp");
 const aes = require("./aes");
 const ipfs = require("./ipfs");
 const multihash = require("./multihash");
+const global = require("./global");
 
 // contract json
 const accountContractJson = require("../eth/build/contracts/Account.json");
-
-// global module variables
-let privateKey,
-    provider,
-    accountContract;
-
-let standard = {
-    rpc: "https://rpc.sesamed.de",
-    network: "219"
-};
 
 /**
  *
  * @typedef {Object} Account
  * @alias Account
  * @memberof module:sesamed
- * @property {Wallet}
- * @property {PgpKeys}
+ * @property {String} mnemonic - the mnemonic of the account
+ * @property {String} address - the address of the account
+ * @property {String} privateKey - the privateKey of the account
  */
+
+
+/**
+*
+* @typedef {Object} UserIds
+* @alias UserIds
+* @memberof module:sesamed
+* @property {String} name - the account name
+* @property {String} [email] - the email of the account
+*/
 
 
 /**
@@ -30729,94 +30791,111 @@ let standard = {
  * @typedef {Object} Wallet
  * @alias Wallet
  * @memberof module:sesamed
- * @property {String} mnemonic The digest output of hash function in hex with prepended "0x"
- * @property {String} path The hash function code for the function used
- * @property {String} privateKey The length of digest
- * @property {String} address The length of digest
+ * @property {String} mnemonic - the mnemonic to restore the account
+ * @property {String} path - the path of the mnemonic
+ * @property {String} privateKey - the private key of the account
+ * @property {String} address - the address of the account
  */
+
 
 /**
  *
  * @typedef {Object} PgpKeys
  * @alias PgpKeys
  * @memberof module:sesamed
- * @property {String} privateKey
- * @property {String} publicKey
+ * @property {String} privateKey - the private pgp key
+ * @property {String} publicKey - the public pgp key
+ */
+
+/**
+ *
+ * @typedef {Object} IpfsGateway
+ * @alias IpfsGateway
+ * @memberof module:sesamed
+ * @property {String} host - the host address (i.e. "ipfs.infura.io")
+ * @properry {Numver} port - the gateway port (i.e. 5001)
+ * @property {String} protocol - "https" / "http"
  */
 
 
 /**
  * Initializes the configuration
  * @alias module:sesamed.init
- * @param {Object} options
- * @param {String} options.accountContractAddress
- * @param {String} options.rpc
- * @param {String} options.privateKey
+ * @param {Object} [options]
+ * @param {String} [options.accountContractAddress] - the address of the account contract
+ * @param {String} [options.rpcUrl] - the url of the rpc provider
+ * @param {IpfsGateway} [options.ipfsGateway] - the ipfsGateway
  */
 function init(options) {
-    provider = new ethers.providers.JsonRpcProvider(options.rpc || standard.rpc);
-    privateKey = options.privateKey;
-    let accountContractAddress = options.accountContractAddress || accountContractJson.networks[standard.network].address;
-    let wallet = new ethers.Wallet(privateKey, provider);
-    accountContract = new ethers.Contract(accountContractAddress, accountContractJson.abi, provider).connect(wallet);
+    options = options || {};
+    ipfs.setGateway(options.ipfsGateway || global.default.ipfsGateway);
+    global.provider = new ethers.providers.JsonRpcProvider(options.rpcUrl || global.default.rpcUrl);
+    let accountContractAddress = options.accountContractAddress || accountContractJson.networks[global.default.network].address;
+    global.accountContract = new ethers.Contract(accountContractAddress, accountContractJson.abi, global.provider);
 }
 
 
 /**
  * creates a new account and sets
- * @alias module:sesamed.createAccount
- * @param {Object} options
- * @param {Object} options.userIds
- * @param {String} options.userIds.name - name connected with pgp keys
- * @param {String} options.userIds.email - email address connected with pgp keys
- * @param {String} options.passphrase - passphrase to encrypt private pgp key
+ * @alias module:sesamed.getNewAccount
+ * @param {String} name - the name of the account
  * @returns {Account} account
  * @example
  * ```js
- * > sesamed.createAccount()
+ * > sesamed.getNewAccount()
  * {
  *     wallet: {},
  *     pgp: {}
  * }
  * ```
  */
-async function createAccount(options) {
+async function getNewAccount(name) {
 
-    const newWallet = await createWallet();
-    const pgpKeys = await pgp.generateKeys({userIds: options.userIds, passphrase: options.passphrase});
+    if (typeof name !== "string" || !name) {
+        throw(new Error("getNewAccount: name missing"));
+    }
+    const mnemonic = await createMnemonic();
+    const wallet = await createWalletFromMnemonic(mnemonic);
+    const pgpKeys = await pgp.generateKeys(name, mnemonic);
 
     return {
-        wallet: newWallet,
-        pgp: pgpKeys,
+        name: name,
+        mnemonic: wallet.mnemonic,
+        address: wallet.address,
+        privateKey: pgpKeys.privateKey
     };
 }
 
 /**
- *
- * @returns {Promise<{path: String, privateKey: String, address: String, mnemonic: String}>}
+ * returns a new wallet
+ * @param {String} mnemonic - the mnemonic to create the wallet from
+ * @returns {Promise}
+ * @resolve {Wallet}
+ * @reject {Error}
  */
-async function createWallet() {
-    const mnemonic = await createMnemonic();
+async function createWalletFromMnemonic(mnemonic) {
     const newWallet = ethers.Wallet.fromMnemonic(mnemonic);
 
     return {
         mnemonic: newWallet.signingKey.mnemonic,
         path: newWallet.signingKey.path,
         privateKey: newWallet.signingKey.privateKey,
-        address: newWallet.signingKey.address
+        address: newWallet.signingKey.address,
     };
 }
 
 /**
- *
- * @returns {Promise<string>}
+ * returns a mnemonic string
+ * @returns {Promise}
+ * @resolve {String} mnemonic
+ * @reject {Error}
  */
 async function createMnemonic() {
     return ethers.utils.HDNode.entropyToMnemonic(getRandomBytes(16));
 }
 
 /**
- *
+ * returns an Array of n random bytes
  * @param {Number} n
  * @returns {Uint8Array}
  */
@@ -30824,54 +30903,114 @@ function getRandomBytes(n) {
     return ethers.utils.randomBytes(n);
 }
 
+/**
+ * sets an account to be used by sesamed
+ * @alias module:sesamed.setAccount
+ * @param {Account} account
+ */
+async function setAccount(account) {
+    if (!account || typeof account !== "object"
+        || !account.name || typeof account.name !== "string"
+        || !account.mnemonic || typeof account.mnemonic !== "string"
+        || !account.privateKey || typeof account.privateKey !== "string"
+    ) {
+        throw(new Error("setAccount: account incomplete"));
+    }
+
+    // create the wallet
+    let wallet = await createWalletFromMnemonic(account.mnemonic);
+    wallet = new ethers.Wallet(wallet.privateKey, global.provider);
+
+    // get contract with signer (wallet)
+    global.accountContract = global.accountContract.connect(wallet);
+
+    // create the pgp keys
+    global.privateKey = account.privateKey;
+    global.publicKey = await pgp.getPublicKeyFromPrivateKey(global.privateKey, account.mnemonic);
+
+    // set account name
+    global.name = account.name;
+}
 
 /**
  * Registers a new account
  * @alias module:sesamed.register
- * @param {String} name
- * @param {String} publicPgpKey
  * @returns {Promise}
+ * @resolve {TxReceipt}
+ * @reject {Error}
  */
-function registerAccount(name, publicPgpKey) {
-    return accountContract.register(name, publicPgpKey);
+async function registerAccount() {
+    if (!global.name) {
+        throw(new Error("registerAccount: no account set - use setAccount before"));
+    }
+    let ipfsHash = await ipfs.write(global.publicKey);
+
+    return global.accountContract.register(global.name, ipfsHash, global.default.repo);
 }
 
-/**
- * Get all new Accounts
- * @param {Number} [from] - Block to Start
- * @param {Number} [to] - Block to End
- * @returns {Promise}
- */
-function getNewAccounts(from, to) {
-    var filter = {
-        fromBlock: from || 0,
-        toBlock: to || "latest",
-        topics: [
-            ethers.utils.id("newAccountEvent(bytes32,string,address,string)")
-        ]
-    };
 
-    return provider.getLogs(filter).then(logs => {
-        return logs.map(function(item) {
-            var decodedData = ethers.utils.defaultAbiCoder.decode(
-                [ "string", "address", "string"],
+/**
+ * returns the public key of an Account
+ * @alias module:sesamed.getPublicKey
+ * @param {String} name - the name of the account
+ * @returns {Promise}
+ * @resolve {String} publicKey
+ * @reject {Error}
+ */
+async function getPublicKey(name) {
+    let accounts = await getLogEntries(
+        0,
+        "latest",
+        global.accountContract.address,
+        "newAccountEvent",
+        ["bytes32","string","uint8"],
+        ethers.utils.id(name)
+    );
+
+    if (accounts.length === 0) {
+        throw (new Error("getPublicKey: account not found"));
+    }
+
+    if (accounts.length > 1) {
+        throw (new Error("getPublicKey: multiple accounts found"));
+    }
+
+    let fileHash = accounts[0].data[0];
+    let publicKey = await ipfs.read(fileHash);
+
+    return publicKey;
+}
+
+function getLogEntries(from, to, contractAddress, eventName, params, topic) {
+    var filter = {
+            fromBlock: from,
+            toBlock: to,
+            address: contractAddress,
+            topics: [
+                ethers.utils.id(eventName + "(" + params.join(",") + ")"),
+                topic
+            ]
+        },
+        decodeData = async function (item) {
+            item.data = ethers.utils.defaultAbiCoder.decode(
+                params.slice(1),
                 item.data
             );
-            item.data = {
-                name: decodedData[0],
-                owner: decodedData[1],
-                publicKey: decodedData[2],
-            };
             return item;
-        });
+        };
+
+    return global.provider.getLogs(filter).then(function (messages) {
+        return Promise.all(messages.map(decodeData));
     });
 }
 
+
 var sesamed = {
     init: init,
-    createAccount: createAccount,
+    getNewAccount: getNewAccount,
+    setAccount: setAccount,
     registerAccount: registerAccount,
-    getNewAccounts: getNewAccounts,
+    getPublicKey: getPublicKey,
     pgp: pgp,
     aes: aes,
     ipfs: ipfs,
@@ -30886,13 +31025,8 @@ if (typeof window !== "undefined") {
 
 
 /**
- * Blockchain for the Healthcare System
  * @module sesamed
  * @typicalname sesamed
- * @example
- * ```js
- * const sesamed = require("sesamed")
- * ```
  */
 
 module.exports = sesamed;
@@ -30900,4 +31034,4 @@ module.exports = sesamed;
 
 
 
-},{"../eth/build/contracts/Account.json":1,"./aes":187,"./ipfs":188,"./multihash":189,"./pgp":190,"ethers":93}]},{},[191]);
+},{"../eth/build/contracts/Account.json":1,"./aes":187,"./global":188,"./ipfs":189,"./multihash":190,"./pgp":191,"ethers":93}]},{},[192]);

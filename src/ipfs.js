@@ -3,12 +3,29 @@
  * @memberOf sesamed
  */
 "use strict";
-// global npm packages
+
+// npm packages
 const IPFS = require("ipfs-mini");
 
-
 // the ipfs provider
-const ipfs = new IPFS({host: "ipfs.infura.io", port: 5001, protocol: "https"});
+let ipfs;
+
+/**
+ * sets the ipfs gateway
+ * @alias module:"sesamed.ipfs".setGateway
+ * @param {String} ipfsGateway
+ */
+function setGateway(ipfsGateway) {
+    if (!ipfsGateway || typeof ipfsGateway !== "object") {
+        throw new Error("setGateway: ipfsGateway is missing");
+    }
+
+    if (!ipfsGateway.host || !ipfsGateway.port || !ipfsGateway.protocol) {
+        throw new Error("setGateway: ipfsGateway incomplete");
+    }
+
+    ipfs = new IPFS(ipfsGateway);
+}
 
 
 /**
@@ -43,8 +60,7 @@ function read(fileHash) {
  */
 
 module.exports = {
+    setGateway: setGateway,
     read: read,
     write: write,
-    // for testing only
-    _ipfs: ipfs
 };

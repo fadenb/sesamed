@@ -15,7 +15,7 @@ if (typeof window === "undefined") {
     var sesamed = require("../src/sesamed");
 
     // contract json
-    var accountContractJson = require("../eth/build/contracts/Account.json");
+    var accountContractJson =  require("./contracts.js").accountContractJson;
 
     // sinon sandbox
     var sandbox;
@@ -32,12 +32,15 @@ describe("sesamed", async function () {
     let accountContractAddress = "accountContractAddress";
     let stubbedProvider = "stubbedProvider";
     let myRpcUrl = "myRpcUrl";
+    let myIpfsGateway = {test:"myIpfsGateway"};
     let stubbedJsonRpcProvider;
     let stubbedPgpGenerateKeys;
     let stubbedPgPgetPublicKeyFromPrivateKey;
     let stubbedEntropyToMnemonic;
     let stubbedEthersWalletFromMnemonic;
     let stubbedIpfsWrite;
+    let stubbedIpfsRead;
+    let stubbedIpfsSetGateway;
     let testWallet;
 
     beforeEach(function () {
@@ -67,7 +70,8 @@ describe("sesamed", async function () {
         stubbedEthersWalletFromMnemonic = sandbox.stub(ethers.Wallet, "fromMnemonic").returns(testWallet);
 
         stubbedIpfsWrite = sandbox.stub(ipfs, "write").returns("ipfsHash");
-        sandbox.stub(ipfs, "read").returns("data");
+        stubbedIpfsRead = sandbox.stub(ipfs, "read").returns("data");
+        stubbedIpfsSetGateway = sandbox.stub(ipfs, "setGateway");
     });
 
     afterEach(function () {
@@ -107,7 +111,8 @@ describe("sesamed", async function () {
 
             sesamed.init({
                 rpcUrl: myRpcUrl,
-                accountContractAddress: accountContractAddress
+                accountContractAddress: accountContractAddress,
+                ipfsGateway: myIpfsGateway
             });
 
             stubbedEthersContract.should.have.been.calledOnce;
@@ -119,18 +124,25 @@ describe("sesamed", async function () {
             }
         });
 
-        it("should use default params if options is not prvided", function () {
-            let fake = sandbox.stub();
-            stubbedEthersContract.callsFake(fake);
-
+        it("should use default params for contract if options is not provided", function () {
             sesamed.init();
 
-            stubbedEthersContract.should.have.been.calledOnce;
-
-            expect(fake).to.be.calledWith(
+            return expect(stubbedEthersContract).to.be.calledWith(
                 accountContractJson.networks[219].address,
                 accountContractJson.abi,
             );
+        });
+
+        it("should use default params for provider if options is not provided", function () {
+            sesamed.init();
+
+            return expect(stubbedJsonRpcProvider).to.be.calledWith(global.default.rpcUrl);
+        });
+
+        it("should use default params for ipfs.setGateway if options is not provided", function () {
+            sesamed.init();
+
+            return expect(stubbedIpfsSetGateway).to.be.calledWith(global.default.ipfsGateway);
         });
 
     });
@@ -312,8 +324,14 @@ describe("sesamed", async function () {
 
     describe("getPublicKey", async function () {
 
+        let resolve;
+
         beforeEach(async function () {
             sesamed.init();
+            resolve = resolve => resolve([{data:["hash"]}]);
+            global.provider.getLogs = sandbox.stub().returns(new Promise(resolve));
+            sandbox.stub(ethers.utils.defaultAbiCoder, "decode").returns(["decoded"]);
+            global.accountContract.address = "address";
         });
 
         it("should be a function", async function () {
@@ -321,21 +339,13 @@ describe("sesamed", async function () {
         });
 
         it("should call global.provider.getLogs", async function () {
-            global.provider.getLogs = sandbox.stub().returns(new Promise(resolve => {
-                resolve([{data:["hash"]}]);
-            }));
-            sandbox.stub(ethers.utils.defaultAbiCoder, "decode").returns("decoded");
             await sesamed.getPublicKey("alice");
             return expect(global.provider.getLogs).to.be.calledOnce;
         });
 
         it("should call global.provider.getLogs with correct filter", async function () {
-            global.provider.getLogs = sandbox.stub().returns(new Promise(resolve => {
-                resolve([{data:["hash"]}]);
-            }));
-            sandbox.stub(ethers.utils.defaultAbiCoder, "decode").returns("decoded");
-            global.accountContract.address = "address";
             await sesamed.getPublicKey("alice");
+
             return expect(global.provider.getLogs).to.be.calledWith({
                 address: "address",
                 fromBlock: 0,
@@ -350,22 +360,31 @@ describe("sesamed", async function () {
         it("should call throw Error if getLogs returns empty array", async function () {
             let err = "getPublicKey: account not found";
 
-            global.provider.getLogs = sandbox.stub().returns(new Promise(resolve => {
-                resolve([]);
-            }));
-            sandbox.stub(ethers.utils.defaultAbiCoder, "decode").returns("decoded");
+            resolve = resolve => resolve([]);
+            global.provider.getLogs.returns(new Promise(resolve));
             return expect(sesamed.getPublicKey("alice")).to.be.rejectedWith(err);
         });
 
         it("should call throw Error if getLogs returns array.length > 1", async function () {
             let err = "getPublicKey: multiple accounts found";
 
-            global.provider.getLogs = sandbox.stub().returns(new Promise(resolve => {
-                resolve([{data:["hash"]}, {data:["hash"]}]);
-            }));
-            sandbox.stub(ethers.utils.defaultAbiCoder, "decode").returns("decoded");
+            resolve = resolve => resolve([{data:["hash1"]}, {data:["hash2"]}]);
+            global.provider.getLogs.returns(new Promise(resolve));
             return expect(sesamed.getPublicKey("alice")).to.be.rejectedWith(err);
         });
+
+        it("should call ipfs.read", async function () {
+            await sesamed.getPublicKey("alice");
+
+            return expect(stubbedIpfsRead).to.be.calledOnce;
+        });
+
+        it("should call ipfs.read with ipfsHash returned from getLogs", async function () {
+            await sesamed.getPublicKey("alice");
+
+            return expect(stubbedIpfsRead).to.be.calledWith("decoded");
+        });
+
     });
 
 });
