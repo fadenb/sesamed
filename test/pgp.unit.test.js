@@ -1,9 +1,7 @@
 if (typeof window === "undefined") {
     // test framework
     var chai = require("chai");
-    var  expect = chai.expect;
-    var  chaiAsPromised = require("chai-as-promised");
-    chai.use(chaiAsPromised);
+    var expect = chai.expect;
 
     // local modules
     var pgp = require("../src/pgp");
@@ -17,13 +15,39 @@ describe("pgp", function () {
 
     describe("generateKeys", function () {
 
-        it("should call openpgp.generateKeys with correct params", async function () {
-            let options = {userIds: {name: "jochen"}, passphrase: "test"};
+        let err = "pgp.generateKeys: missing name or passphrase";
 
-            let keys = await pgp.generateKeys(options);
+        it("should throw error if name is missing", async function () {
+            return expect(() => pgp.generateKeys()).to.throw(err);
+        });
+
+        it("should throw error if passphrase is missing", async function () {
+            return expect(() => pgp.generateKeys("alice")).to.throw(err);
+        });
+
+        it("should throw error if name is no string", async function () {
+            return expect(() => pgp.generateKeys(1, "passphrase")).to.throw(err);
+        });
+
+        it("should throw error if passphrase is no string", async function () {
+            return expect(() => pgp.generateKeys("alice", {})).to.throw(err);
+        });
+
+        it("should call openpgp.generateKeys with correct params", async function () {
+            let keys = await pgp.generateKeys("alice", "passphrase");
 
             expect(keys.publicKey.substr(0,36)).to.equal("-----BEGIN PGP PUBLIC KEY BLOCK-----");
             expect(keys.privateKey.substr(0,37)).to.equal("-----BEGIN PGP PRIVATE KEY BLOCK-----");
+        });
+
+    });
+
+    describe("getPublicKeyFromPrivateKey", function () {
+
+        it("should get public key from private key", async function() {
+            let publicKey = await pgp.getPublicKeyFromPrivateKey(testData[0].privateKey, testData[0].passphrase);
+
+            expect(publicKey).to.equal(testData[0].publicKey);
         });
 
     });

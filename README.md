@@ -1,3 +1,16 @@
+<h1 align="center">
+    <a href="https://ipfs.io">
+        <img src="https://ipfs.io/ipfs/QmcFCZqMQi8jP2TkdicBzWVoeDosmdsftAqTaLNY7kH5yV" alt="Sesamed logo" />
+    </a>
+</h1>
+
+<h3 align="center">Sesamed - Blockchain for the  Healthcare System</h3>
+
+<p align="center">
+    <a href="https://www.redmedical.de"><img src="https://img.shields.io/badge/made%20by-RED%20Medical-blue.svg" /></a>
+</p>
+
+
 [![view on npm](http://img.shields.io/npm/v/sesamed.svg)](https://www.npmjs.org/package/sesamed)
 [![npm module downloads](http://img.shields.io/npm/dt/sesamed.svg)](https://www.npmjs.org/package/sesamed)
 [![codecov](https://codecov.io/gh/redmedical/sesamed/branch/master/graph/badge.svg)](https://codecov.io/gh/redmedical/sesamed)
@@ -16,43 +29,65 @@ Blockchain for the German Healthcare System
 - Large collection of **test cases** which are maintained and added to
 - **GPL-3.0 License** (including ALL dependencies)
 
-Installing
-----------
+# Installing
 
-To use in a browser:
+Installation is simple, just install via npm.
+
+```bash
+npm install --save sesamed
+```
+
+
+# Using
+
+## In the browser
 
 ```html
 <script src="dist/sesamed.min.js" type="text/javascript"></script>
 ```
 
-To use in [node.js](https://nodejs.org/):
+## With Node.js
 
 ```sh
-npm install --save sesamed
+let sesamed = require("sesamed");
 ```
+
+# Contributing
+If you want to contribute you are welcome. Please regard the point below.
+
+## Committing
+
+This project is based on [Karma Git Commit Convention](http://karma-runner.github.io/3.0/dev/git-commit-msg.html).
+See their [commit history](https://github.com/karma-runner/karma/commits/master) for examples of properly-formatted
+commit messages.
 
 # API Reference
-    Blockchain for the Healthcare System
 
-**Example**  
-```js
-const sesamed = require("sesamed")
-```
+## Standard functions
 
+    
 * [sesamed](#module_sesamed)
     * _global_
         * [Multihash](#Multihash) : <code>Object</code>
         * [Account](#Account) : <code>Object</code>
+        * [UserIds](#UserIds) : <code>Object</code>
         * [Wallet](#Wallet) : <code>Object</code>
         * [PgpKeys](#PgpKeys) : <code>Object</code>
+        * [IpfsGateway](#IpfsGateway) : <code>Object</code>
     * _static_
-        * [.init(options)](#module_sesamed.init)
-        * [.createAccount(options)](#module_sesamed.createAccount) ⇒ [<code>Account</code>](#Account)
-        * [.register(name, publicPgpKey)](#module_sesamed.register) ⇒ <code>Promise</code>
+        * [.init([options])](#module_sesamed.init)
+        * [.getNewAccount(name)](#module_sesamed.getNewAccount) ⇒ [<code>Account</code>](#Account)
+        * [.setAccount(account)](#module_sesamed.setAccount)
+        * [.register()](#module_sesamed.register) ⇒ <code>Promise</code>
+        * [.getPublicKey(name)](#module_sesamed.getPublicKey) ⇒ <code>Promise</code>
+
+
+## Utilities
 
     
 * [sesamed.pgp](#module_sesamed.pgp)
-    * [.generateKeys(options)](#module_sesamed.pgp.generateKeys) ⇒ <code>Promise</code>
+    * [.generateKeys(name, passphrase)](#module_sesamed.pgp.generateKeys) ⇒ <code>Promise</code>
+    * [.getPublicKeyFromPrivateKey(privateKey, passphrase)](#module_sesamed.pgp.getPublicKeyFromPrivateKey) ⇒ <code>Promise</code>
     * [.encrypt(options)](#module_sesamed.pgp.encrypt) ⇒ <code>Promise</code>
     * [.decrypt(options)](#module_sesamed.pgp.decrypt) ⇒ <code>Promise</code>
 
@@ -65,6 +100,7 @@ const sesamed = require("sesamed")
 
     
 * [sesamed.ipfs](#module_sesamed.ipfs)
+    * [.setGateway(ipfsGateway)](#module_sesamed.ipfs.setGateway)
     * [.write(data)](#module_sesamed.ipfs.write) ⇒ <code>Promise</code>
     * [.read(fileHash)](#module_sesamed.ipfs.read) ⇒ <code>Promise</code>
 
@@ -73,9 +109,12 @@ const sesamed = require("sesamed")
     * [.getMultihashFromBase58(b58hash)](#module_sesamed.multihash.getMultihashFromBase58) ⇒ [<code>Multihash</code>](#Multihash)
     * [.getBase58FromMultihash(multihash)](#module_sesamed.multihash.getBase58FromMultihash) ⇒ <code>string</code>
 
-    <a name="Multihash"></a>
 
-### sesamedMultihash : <code>Object</code>
+## Standard functions
+
+<a name="Multihash"></a>
+
+### Multihash : <code>Object</code>
 **Kind**: global typedef of [<code>sesamed</code>](#module_sesamed)  
 **Properties**
 
@@ -85,95 +124,143 @@ const sesamed = require("sesamed")
 
 <a name="Account"></a>
 
-### sesamedAccount : <code>Object</code>
+### Account : <code>Object</code>
 **Kind**: global typedef of [<code>sesamed</code>](#module_sesamed)  
 **Properties**
 
--  [<code>Wallet</code>](#Wallet)  
--  [<code>PgpKeys</code>](#PgpKeys)  
+- mnemonic <code>String</code> - the mnemonic of the account  
+- address <code>String</code> - the address of the account  
+- privateKey <code>String</code> - the privateKey of the account  
+
+<a name="UserIds"></a>
+
+### UserIds : <code>Object</code>
+**Kind**: global typedef of [<code>sesamed</code>](#module_sesamed)  
+**Properties**
+
+- name <code>String</code> - the account name  
+- email <code>String</code> - the email of the account  
 
 <a name="Wallet"></a>
 
-### sesamedWallet : <code>Object</code>
+### Wallet : <code>Object</code>
 **Kind**: global typedef of [<code>sesamed</code>](#module_sesamed)  
 **Properties**
 
-- mnemonic <code>String</code> - The digest output of hash function in hex with prepended "0x"  
-- path <code>String</code> - The hash function code for the function used  
-- privateKey <code>String</code> - The length of digest  
-- address <code>String</code> - The length of digest  
+- mnemonic <code>String</code> - the mnemonic to restore the account  
+- path <code>String</code> - the path of the mnemonic  
+- privateKey <code>String</code> - the private key of the account  
+- address <code>String</code> - the address of the account  
 
 <a name="PgpKeys"></a>
 
-### sesamedPgpKeys : <code>Object</code>
+### PgpKeys : <code>Object</code>
 **Kind**: global typedef of [<code>sesamed</code>](#module_sesamed)  
 **Properties**
 
-- privateKey <code>String</code>  
-- publicKey <code>String</code>  
+- privateKey <code>String</code> - the private pgp key  
+- publicKey <code>String</code> - the public pgp key  
+
+<a name="IpfsGateway"></a>
+
+### IpfsGateway : <code>Object</code>
+**Kind**: global typedef of [<code>sesamed</code>](#module_sesamed)  
+**Properry**: <code>Numver</code> port - the gateway port (i.e. 5001)  
+**Properties**
+
+- host <code>String</code> - the host address (i.e. "ipfs.infura.io")  
+- protocol <code>String</code> - "https" / "http"  
 
 <a name="module_sesamed.init"></a>
 
-### sesamed.init(options)
+### sesamed.init([options])
 Initializes the configuration
 
 **Kind**: static method of [<code>sesamed</code>](#module_sesamed)  
 **Params**
 
-- options <code>Object</code>
-    - .accountContractAddress <code>String</code>
-    - .rpc <code>String</code>
-    - .privateKey <code>String</code>
+- [options] <code>Object</code>
+    - [.accountContractAddress] <code>String</code> - the address of the account contract
+    - [.rpcUrl] <code>String</code> - the url of the rpc provider
+    - [.ipfsGateway] [<code>IpfsGateway</code>](#IpfsGateway) - the ipfsGateway
 
-<a name="module_sesamed.createAccount"></a>
+<a name="module_sesamed.getNewAccount"></a>
 
-### sesamed.createAccount(options) ⇒ [<code>Account</code>](#Account)
+### sesamed.getNewAccount(name) ⇒ [<code>Account</code>](#Account)
 creates a new account and sets
 
 **Kind**: static method of [<code>sesamed</code>](#module_sesamed)  
 **Returns**: [<code>Account</code>](#Account) - account  
 **Params**
 
-- options <code>Object</code>
-    - .userIds <code>Object</code>
-        - .name <code>String</code> - name connected with pgp keys
-        - .email <code>String</code> - email address connected with pgp keys
-    - .passphrase <code>String</code> - passphrase to encrypt private pgp key
+- name <code>String</code> - the name of the account
 
 **Example**  
 ```js
-> sesamed.createAccount()
+> sesamed.getNewAccount()
 {
     wallet: {},
     pgp: {}
 }
 ```
-<a name="module_sesamed.register"></a>
+<a name="module_sesamed.setAccount"></a>
 
-### sesamed.register(name, publicPgpKey) ⇒ <code>Promise</code>
-Registers a new account
+### sesamed.setAccount(account)
+sets an account to be used by sesamed
 
 **Kind**: static method of [<code>sesamed</code>](#module_sesamed)  
 **Params**
 
-- name <code>String</code>
-- publicPgpKey <code>String</code>
+- account [<code>Account</code>](#Account)
 
-    <a name="module_sesamed.pgp.generateKeys"></a>
+<a name="module_sesamed.register"></a>
 
-### sesamed.pgp.generateKeys(options) ⇒ <code>Promise</code>
-Creates a new pgp key pair
+### sesamed.register() ⇒ <code>Promise</code>
+Registers a new account
 
-**Kind**: static method of [<code>sesamed.pgp</code>](#module_sesamed.pgp)  
-**Fulfil**: [<code>PgpKeys</code>](#PgpKeys) pgpKeys  
+**Kind**: static method of [<code>sesamed</code>](#module_sesamed)  
+**Resolve**: <code>TxReceipt</code>  
+**Reject**: <code>Error</code>  
+<a name="module_sesamed.getPublicKey"></a>
+
+### sesamed.getPublicKey(name) ⇒ <code>Promise</code>
+returns the public key of an Account
+
+**Kind**: static method of [<code>sesamed</code>](#module_sesamed)  
+**Resolve**: <code>String</code> publicKey  
 **Reject**: <code>Error</code>  
 **Params**
 
-- options <code>Object</code>
-    - .userIds <code>Object</code>
-        - .name <code>String</code>
-        - .email <code>String</code>
-    - .passphrase <code>String</code>
+- name <code>String</code> - the name of the account
+
+
+## Utilities
+
+<a name="module_sesamed.pgp.generateKeys"></a>
+
+### sesamed.pgp.generateKeys(name, passphrase) ⇒ <code>Promise</code>
+Creates a new pgp key pair
+
+**Kind**: static method of [<code>sesamed.pgp</code>](#module_sesamed.pgp)  
+**Resolve**: [<code>PgpKeys</code>](#PgpKeys) pgpKeys  
+**Reject**: <code>Error</code>  
+**Params**
+
+- name <code>String</code> - the name associated with the pgp keys
+- passphrase <code>String</code> - the passphrase protecting the private key
+
+<a name="module_sesamed.pgp.getPublicKeyFromPrivateKey"></a>
+
+### sesamed.pgp.getPublicKeyFromPrivateKey(privateKey, passphrase) ⇒ <code>Promise</code>
+returns a the publicKey from a privateKey and a passphrase
+
+**Kind**: static method of [<code>sesamed.pgp</code>](#module_sesamed.pgp)  
+**Resolve**: <code>String</code> publicKey  
+**Reject**: <code>Error</code>  
+**Params**
+
+- privateKey <code>String</code>
+- passphrase <code>String</code>
 
 <a name="module_sesamed.pgp.encrypt"></a>
 
@@ -181,7 +268,7 @@ Creates a new pgp key pair
 Encrypts data with public key and signs if private key is provided
 
 **Kind**: static method of [<code>sesamed.pgp</code>](#module_sesamed.pgp)  
-**Fulfil**: <code>string</code> ciphertext  
+**Resolve**: <code>string</code> ciphertext  
 **Reject**: <code>Error</code>  
 **Params**
 
@@ -197,7 +284,7 @@ Encrypts data with public key and signs if private key is provided
 Decrypts data with private key and checks signature if public key is provided
 
 **Kind**: static method of [<code>sesamed.pgp</code>](#module_sesamed.pgp)  
-**Fulfil**: <code>string</code> cleartext  
+**Resolve**: <code>string</code> cleartext  
 **Reject**: <code>Error</code>  
 **Params**
 
@@ -213,7 +300,7 @@ Decrypts data with private key and checks signature if public key is provided
 Returns a base64 encoded AES key
 
 **Kind**: static method of [<code>sesamed.aes</code>](#module_sesamed.aes)  
-**Fulfil**: <code>string</code> key - a base64 encoded AES key  
+**Resolve**: <code>String</code> key - a base64 encoded AES key  
 **Reject**: <code>Error</code> - this should not happen  
 <a name="module_sesamed.aes.importKey"></a>
 
@@ -221,7 +308,7 @@ Returns a base64 encoded AES key
 imports a base64 encoded key into a CryptoKey
 
 **Kind**: static method of [<code>sesamed.aes</code>](#module_sesamed.aes)  
-**Fulfil**: <code>CryptoKey</code>  
+**Resolve**: <code>CryptoKey</code>  
 **Reject**: <code>Error</code>  
 **Params**
 
@@ -233,7 +320,7 @@ imports a base64 encoded key into a CryptoKey
 AES-encrypts cleartext to cyphertext with the given key
 
 **Kind**: static method of [<code>sesamed.aes</code>](#module_sesamed.aes)  
-**Fulfil**: <code>string</code> ciphertext - the base64 encoded ciphertext  
+**Resolve**: <code>string</code> ciphertext - the base64 encoded ciphertext  
 **Reject**: <code>Error</code>  
 **Params**
 
@@ -246,20 +333,30 @@ AES-encrypts cleartext to cyphertext with the given key
 AES-decryptfs cyphertext to cleartext with the given key
 
 **Kind**: static method of [<code>sesamed.aes</code>](#module_sesamed.aes)  
-**Fulfil**: <code>String</code> ciphertext - the base64 encoded ciphertext  
+**Resolve**: <code>String</code> ciphertext - the base64 encoded ciphertext  
 **Reject**: <code>Error</code>  
 **Params**
 
 - key <code>String</code>
 - ciphertext <code>String</code>
 
-    <a name="module_sesamed.ipfs.write"></a>
+    <a name="module_sesamed.ipfs.setGateway"></a>
+
+### sesamed.ipfs.setGateway(ipfsGateway)
+sets the ipfs gateway
+
+**Kind**: static method of [<code>sesamed.ipfs</code>](#module_sesamed.ipfs)  
+**Params**
+
+- ipfsGateway <code>String</code>
+
+<a name="module_sesamed.ipfs.write"></a>
 
 ### sesamed.ipfs.write(data) ⇒ <code>Promise</code>
 Writes data to the ipfs
 
 **Kind**: static method of [<code>sesamed.ipfs</code>](#module_sesamed.ipfs)  
-**Fulfil**: <code>string</code> fileHash  
+**Resolve**: <code>String</code> fileHash  
 **Reject**: <code>Error</code>  
 **Params**
 
@@ -271,7 +368,7 @@ Writes data to the ipfs
 Reads data from the ipfs
 
 **Kind**: static method of [<code>sesamed.ipfs</code>](#module_sesamed.ipfs)  
-**Fulfil**: <code>string</code> data - the data which has been read  
+**Resolve**: <code>String</code> data - the data which has been read  
 **Reject**: <code>Error</code>  
 **Params**
 

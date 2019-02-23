@@ -9,20 +9,21 @@ const openpgp = require("openpgp");
 /**
  * Creates a new pgp key pair
  * @alias module:sesamed.pgp.generateKeys
- * @param {Object} options
- * @param {Object} options.userIds
- * @param {String} options.userIds.name
- * @param {String} options.userIds.email
- * @param {String} options.passphrase
+ * @param {String} name - the name associated with the pgp keys
+ * @param {String} passphrase - the passphrase protecting the private key
  * @returns {Promise}
- * @fulfil {PgpKeys} pgpKeys
+ * @resolve {PgpKeys} pgpKeys
  * @reject {Error}
  */
-function generateKeys(options) {
+function generateKeys(name, passphrase) {
+    if (!name || !passphrase || typeof name !== "string" || typeof passphrase !== "string") {
+        throw(new Error("pgp.generateKeys: missing name or passphrase"));
+    }
+
     return openpgp.generateKey({
-        userIds: options.userIds,
+        userIds: {name: name},
         curve: "ed25519",
-        passphrase: options.passphrase
+        passphrase: passphrase
     }).then(key => {
         let privateKey = key.privateKeyArmored,
             publicKey = key.publicKeyArmored;
@@ -35,6 +36,22 @@ function generateKeys(options) {
 }
 
 /**
+ * returns a the publicKey from a privateKey and a passphrase
+ * @alias module:"sesamed.pgp".getPublicKeyFromPrivateKey
+ * @param {String} privateKey
+ * @param {String} passphrase
+ * @returns {Promise}
+ * @resolve {String} publicKey
+ * @reject {Error}
+ */
+async function getPublicKeyFromPrivateKey(privateKey, passphrase) {
+    let privateKeyObj = (await openpgp.key.readArmored(privateKey)).keys[0];
+    privateKeyObj.decrypt(passphrase);
+    let publicKey = privateKeyObj.toPublic().armor();
+    return publicKey;
+}
+
+/**
  * Encrypts data with public key and signs if private key is provided
  * @alias module:"sesamed.pgp".encrypt
  * @memberof module:"sesamed.pgp"
@@ -44,7 +61,7 @@ function generateKeys(options) {
  * @param {String} options.passphrase
  * @param {String} options.cleartext
  * @returns {Promise}
- * @fulfil {string} ciphertext
+ * @resolve {string} ciphertext
  * @reject {Error}
  */
 async function encrypt(options) {
@@ -84,7 +101,7 @@ async function encrypt(options) {
  * @param {String} [options.publicKey]
  * @param {String} options.ciphertext
  * @returns {Promise}
- * @fulfil {string} cleartext
+ * @resolve {string} cleartext
  * @reject {Error}
  */
 async function decrypt(options) {
@@ -119,6 +136,7 @@ async function decrypt(options) {
 
 let pgp = {
     generateKeys: generateKeys,
+    getPublicKeyFromPrivateKey: getPublicKeyFromPrivateKey,
     encrypt: encrypt,
     decrypt: decrypt
 };

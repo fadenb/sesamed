@@ -6,7 +6,7 @@ const base64ArrayBuffer = require("base64-arraybuffer");
  * Returns a base64 encoded AES key
  * @alias module:"sesamed.aes".generateKey
  * @returns {Promise}
- * @fulfil {string} key - a base64 encoded AES key
+ * @resolve {String} key - a base64 encoded AES key
  * @reject {Error} - this should not happen
  */
 async function generateKey() {
@@ -30,7 +30,7 @@ async function generateKey() {
  * @alias module:"sesamed.aes".importKey
  * @param {string} key - the base64 encoded AES key
  * @returns {Promise}
- * @fulfil {CryptoKey}
+ * @resolve {CryptoKey}
  * @reject {Error}
  */
 async function importKey(key) {
@@ -56,7 +56,7 @@ async function importKey(key) {
  * @param {String} key
  * @param {String} cleartext
  * @returns {Promise}
- * @fulfil {string} ciphertext - the base64 encoded ciphertext
+ * @resolve {string} ciphertext - the base64 encoded ciphertext
  * @reject {Error}
  */
 async function encrypt(key, cleartext) {
@@ -85,7 +85,7 @@ async function encrypt(key, cleartext) {
  * @param {String} key
  * @param {String} ciphertext
  * @returns {Promise}
- * @fulfil {String} ciphertext - the base64 encoded ciphertext
+ * @resolve {String} ciphertext - the base64 encoded ciphertext
  * @reject {Error}
  */
 async function decrypt(key, ciphertext) {
