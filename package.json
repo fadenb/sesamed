@@ -9,11 +9,12 @@
     "testContracts": "cd eth && sh waitForGanache.sh && npx truffle test test/contracts.test.js",
     "testSesamed": "cd eth && sh waitForGanache.sh && npx truffle test test/sesamed.si.test.js",
     "lint": "npx eslint src test eth/migrations eth/test",
+    "browserifyTests": "npx browserify test/sesamed.unit.test.js -o test/browserify/sesamed.unit.test.js",
     "browserify": "npx browserify src/sesamed.js -o dist/sesamed.js && npx browserify test/browserify/browserify_devlibs.js -o test/browserify/devlibs.js",
     "docs": "npx jsdoc2md --property-list-format list --param-list-format list -t jsdoc2md/README.hbs src/*.js > README.md; echo",
     "report-cover": "npx nyc report --reporter=text-lcov > coverage.lcov && npx codecov"
   },
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": {
     "name": "RED Medical Systems GmbH",
     "email": "info@redmedical.de",
