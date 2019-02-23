@@ -1,14 +1,14 @@
-if (typeof window === "undefined") {
-    // test framework
-    var chai = require("chai");
-    var expect = chai.expect;
+// test framework
+var chai = require("chai");
+var chaiAsPromised = require("chai-as-promised");
+chai.use(chaiAsPromised);
+var expect = chai.expect;
 
-    // local modules
-    var pgp = require("../src/pgp");
+// local modules
+var pgp = require("../src/pgp");
 
-    // test data
-    var testData = require("./testdata.js").testData;
-}
+// test data
+var testData = require("./testdata.js").testData;
 
 
 describe("pgp", function () {

@@ -1,25 +1,28 @@
+// define global window to get test cover of 100 %
 if (typeof window === "undefined") {
-    // test framework
-    var chai = require("chai");
-    var expect = chai.expect;
-    var sinon = require("sinon");
-    var sinonChai = require("sinon-chai");
-    chai.use(sinonChai);
-    chai.should();
-
-    // define global window to get test cover of 100 %
     window = {};  // eslint-disable-line no-global-assign
-
-    // local modules
-    var global = require("../src/global");
-    var sesamed = require("../src/sesamed");
-
-    // contract json
-    var accountContractJson =  require("./contracts.js").accountContractJson;
-
-    // sinon sandbox
-    var sandbox;
 }
+
+// test framework
+var chai = require("chai");
+var expect = chai.expect;
+var sinon = require("sinon");
+var sinonChai = require("sinon-chai");
+var chaiAsPromised = require("chai-as-promised");
+
+chai.use(chaiAsPromised);
+chai.use(sinonChai);
+chai.should();
+
+// local modules
+var global = require("../src/global");
+var sesamed = require("../src/sesamed");
+
+// contract json
+var accountContractJson =  require("./contracts.js").accountContractJson;
+
+// sinon sandbox
+var sandbox;
 
 var ethers = sesamed._ethers;
 var pgp = sesamed.pgp;

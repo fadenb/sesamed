@@ -1,16 +1,14 @@
-if (typeof window === "undefined") {
 // test framework
-    var chai = require("chai");
-    var  expect = chai.expect;
-    var  chaiAsPromised = require("chai-as-promised");
-    chai.use(chaiAsPromised);
+var chai = require("chai");
+var  expect = chai.expect;
+var  chaiAsPromised = require("chai-as-promised");
+chai.use(chaiAsPromised);
 
-    // local modules
-    var aes = require("../src/aes");
+// local modules
+var aes = require("../src/aes");
 
-    // test data
-    var testData = require("./testdata.js").testData;
-}
+// test data
+var testData = require("./testdata.js").testData;
 
 describe("aes", function () {
     describe("generateKey", function () {
@@ -20,7 +18,6 @@ describe("aes", function () {
 
             expect(key).to.be.a("string");
         });
-
     });
 
     describe("encrypt", function () {

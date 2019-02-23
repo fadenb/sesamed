@@ -7,21 +7,25 @@
 <body>
 <div id="mocha"></div>
 <script src="../node_modules/mocha/mocha.js"></script>
-<script src="../node_modules/chai/chai.js"></script>
-<script src="browserify/devlibs.js"></script>
+<!--script src="../node_modules/chai/chai.js"></script>
+<script src="browserify/devlibs.js"></script-->
 <script src="../dist/sesamed.js"></script>
-<script src="testdata.js"></script>
+<!--script src="testdata.js"></script-->
 <script>mocha.setup('bdd')</script>
 
-<script src="sesamed.unit.test.js"></script>
-<script src="multihash.unit.test.js"></script>
+<script src="browserify/sesamed.unit.test.js"></script>
+<script src="browserify/aes.unit.test.js"></script>
+<script src="browserify/pgp.unit.test.js"></script>
+<script src="browserify/multihash.unit.test.js"></script>
+<!--script src="multihash.unit.test.js"></script>
 <script src="aes.unit.test.js"></script>
 <script src="pgp.unit.test.js"></script>
-<script src="ipfs.unit.test.js"></script>
+<script src="ipfs.unit.test.js"></script-->
 
 <!-- load your test files here -->
 
 <script>
+    /*
     var expect=chai.expect;
     chai.use(chaiAsPromised);
     chai.use(sinonChai);
@@ -29,7 +33,7 @@
     var aes = sesamed.aes;
     var pgp = sesamed.pgp;
     var ipfs = sesamed.ipfs;
-    var multihash = sesamed.multihash;
+    var multihash = sesamed.multihash;*/
     mocha.run();
 </script>
 </body>

@@ -1,14 +1,12 @@
-if (typeof window === "undefined") {
-    // test framework
-    var chai = require("chai");
-    var  expect = chai.expect;
+// test framework
+var chai = require("chai");
+var  expect = chai.expect;
 
-    // local modules
-    var  multihash = require("../src/multihash");
+// local modules
+var  multihash = require("../src/multihash");
 
-    // test data
-    var testData = require("./testdata.js").testData;
-}
+// test data
+var testData = require("./testdata.js").testData;
 
 describe("multihash", function () {
 

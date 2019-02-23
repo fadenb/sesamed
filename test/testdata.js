@@ -30,6 +30,4 @@ var testData = [
     }
 ];
 
-if (typeof window === "undefined") {
-    exports.testData = testData;
-}
+exports.testData = testData;

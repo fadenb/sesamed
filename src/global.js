@@ -12,8 +12,6 @@ standard = {
     repo: 1 // 1 = ipfs
 };
 
-
-
 module.exports = {
     provider: provider,
     privateKey: privateKey,

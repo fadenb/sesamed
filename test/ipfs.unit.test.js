@@ -1,18 +1,16 @@
-if (typeof window === "undefined") {
-    // test framework
-    var chai = require("chai");
-    var expect = chai.expect;
-    var sinon = require("sinon");
-    var sinonChai = require("sinon-chai");
-    chai.use(sinonChai);
-    chai.should();
+// test framework
+var chai = require("chai");
+var expect = chai.expect;
+var sinon = require("sinon");
+var sinonChai = require("sinon-chai");
+chai.use(sinonChai);
+chai.should();
 
-    // npm packages
-    var rewire = require("rewire");
+// npm packages
+var rewire = require("rewire");
 
-    // local modules
-    var ipfs = rewire("../src/ipfs");
-}
+// local modules
+var ipfs = rewire("../src/ipfs");
 
 describe("ipfs", function () {
 
