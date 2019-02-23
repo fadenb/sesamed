@@ -25,6 +25,10 @@ contract("Sesamed",  function (accounts) {
         channelId31 = web3.utils.randomHex(32),
         channelId41 = web3.utils.randomHex(32),
         channelId51 = web3.utils.randomHex(32),
+        ciphertext12 = "cipher12",
+        ciphertext31 = "cipher31",
+        ciphertext21 = "cipher21",
+        ciphertext41 = "cipher41",
         ipfsHash12 = "ipfs12",
         ipfsHash21 = "ipfs21",
         ipfsHash31 = "ipfs31",
@@ -133,26 +137,23 @@ contract("Sesamed",  function (accounts) {
     describe("Channel", async function () {
         describe("createChannel", async function () {
             it("should create channel12 from account1 successfully", async function () {
-                let ciphertext = "cipher12";
 
-                let response = await channelContract.createChannel(channelId12, ciphertext);
+                let response = await channelContract.createChannel(channelId12, ciphertext12);
                 truffleAssert.eventEmitted(response, "newChannelEvent", (ev) => {
                     return (
                         ev.channelId === channelId12
-                        && ev.ciphertext === ciphertext
+                        && ev.ciphertext === ciphertext12
                     );
                 });
             });
 
 
             it("should create channel31 from account3 successfully", async function () {
-                let ciphertext = "cipher31";
-
-                let response = await channelContract.createChannel(channelId31, ciphertext, {from: account3});
+                let response = await channelContract.createChannel(channelId31, ciphertext31, {from: account3});
                 truffleAssert.eventEmitted(response, "newChannelEvent", (ev) => {
                     return (
                         ev.channelId === channelId31
-                        && ev.ciphertext === ciphertext
+                        && ev.ciphertext === ciphertext31
                     );
 
                 });
@@ -170,13 +171,11 @@ contract("Sesamed",  function (accounts) {
             });
 
             it("should create channel21 from account2 successfully", async function () {
-                let ciphertext = "cipher21";
-
-                let response = await channelContract.createChannel(channelId21, ciphertext, {from: account2});
+                let response = await channelContract.createChannel(channelId21, ciphertext21, {from: account2});
                 truffleAssert.eventEmitted(response, "newChannelEvent", (ev) => {
                     return (
                         ev.channelId === channelId21
-                        && ev.ciphertext === ciphertext
+                        && ev.ciphertext === ciphertext21
                     );
 
                 });
@@ -184,10 +183,8 @@ contract("Sesamed",  function (accounts) {
 
 
             it("should create channel41 from (not registered) account4 an get reverted", async function () {
-                let ciphertext = "cipher41";
-
                 await truffleAssert.fails(
-                    channelContract.createChannel(channelId41, ciphertext, {from: account4}),
+                    channelContract.createChannel(channelId41, ciphertext41, {from: account4}),
                     truffleAssert.ErrorType.REVERT,
                     "notExistsAddress"
                 );
@@ -208,6 +205,9 @@ contract("Sesamed",  function (accounts) {
                 });
 
                 expect(logs.length).to.equal(3);
+                expect(logs[0].ciphertext).to.equal(ciphertext12);
+                expect(logs[1].ciphertext).to.equal(ciphertext31);
+                expect(logs[2].ciphertext).to.equal(ciphertext21);
                 expect(logs[0].channelId).to.equal(channelId12);
                 expect(logs[1].channelId).to.equal(channelId31);
                 expect(logs[2].channelId).to.equal(channelId21);
