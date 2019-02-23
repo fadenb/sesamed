@@ -54,6 +54,7 @@
     "jsdoc-to-markdown": "^4.0.1",
     "mocha": "^4.1.0",
     "nyc": "^13.3.0",
+    "rewire": "^4.0.1",
     "sinon": "^7.2.3",
     "sinon-chai": "^3.3.0",
     "truffle": "^5.0.4",
