@@ -10,6 +10,9 @@
     "testSesamed": "cd eth && sh waitForGanache.sh && npx truffle test test/sesamed.si.test.js",
     "lint": "npx eslint src test eth/migrations eth/test",
     "browserify": "npx browserify src/sesamed.js -o dist/sesamed.js",
+    "release:major": "changelog -M && git add CHANGELOG.md && git commit -m 'updated CHANGELOG.md' && npm version major && git push origin && git push origin --tags",
+    "release:minor": "changelog -m && git add CHANGELOG.md && git commit -m 'updated CHANGELOG.md' && npm version minor && git push origin && git push origin --tags",
+    "release:patch": "changelog -p && git add CHANGELOG.md && git commit -m 'updated CHANGELOG.md' && npm version patch && git push origin && git push origin --tags",
     "docs": "npx jsdoc2md --property-list-format list --param-list-format list -t jsdoc2md/README.hbs src/*.js > README.md && node jsdoc2md/afterCareDocs.js",
     "report-cover": "npx nyc report --reporter=text-lcov > coverage.lcov && npx codecov"
   },
