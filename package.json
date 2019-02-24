@@ -9,12 +9,6 @@
     "testContracts": "cd eth && sh waitForGanache.sh && npx truffle test test/contracts.test.js",
     "testSesamed": "cd eth && sh waitForGanache.sh && npx truffle test test/sesamed.si.test.js",
     "lint": "npx eslint src test eth/migrations eth/test",
-    "browserifyTestsPgp": "npx browserify test/pgp.unit.test.js -o test/browserify/pgp.unit.test.js",
-    "browserifyTestsAes": "npx browserify test/aes.unit.test.js -o test/browserify/aes.unit.test.js",
-    "browserifyTestsMultihash": "npx browserify test/multihash.unit.test.js -o test/browserify/multihash.unit.test.js",
-    "browserifyTestsIpfs": "npx browserify test/ipfs.unit.test.js -o test/browserify/ipfs.unit.test.js",
-    "browserifyTestsSesamed": "npx browserify test/sesamed.unit.test.js -o test/browserify/sesamed.unit.test.js",
-    "browserifyTests": "npm run browserifyTestsSesamed && npm run browserifyTestsAes && npm run browserifyTestsPgp && npm run browserifyTestsMultihash",
     "browserify": "npx browserify src/sesamed.js -o dist/sesamed.js",
     "docs": "npx jsdoc2md --property-list-format list --param-list-format list -t jsdoc2md/README.hbs src/*.js > README.md && node jsdoc2md/afterCareDocs.js",
     "report-cover": "npx nyc report --reporter=text-lcov > coverage.lcov && npx codecov"
