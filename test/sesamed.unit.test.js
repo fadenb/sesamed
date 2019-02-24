@@ -1,25 +1,32 @@
+// define global window to get test cover of 100 %
 if (typeof window === "undefined") {
-    // test framework
-    var chai = require("chai");
-    var expect = chai.expect;
-    var sinon = require("sinon");
-    var sinonChai = require("sinon-chai");
-    chai.use(sinonChai);
-    chai.should();
-
-    // define global window to get test cover of 100 %
     window = {};  // eslint-disable-line no-global-assign
-
-    // local modules
-    var global = require("../src/global");
-    var sesamed = require("../src/sesamed");
-
-    // contract json
-    var accountContractJson =  require("./contracts.js").accountContractJson;
-
-    // sinon sandbox
-    var sandbox;
 }
+
+// test framework
+var chai = require("chai");
+var expect = chai.expect;
+var sinon = require("sinon");
+var sinonChai = require("sinon-chai");
+var chaiAsPromised = require("chai-as-promised");
+var chaiSpies = require("chai-spies");
+
+chai.use(chaiSpies);
+chai.use(chaiAsPromised);
+chai.use(sinonChai);
+chai.should();
+
+// local modules
+var global = require("../src/global");
+var sesamed = require("../src/sesamed");
+
+// contract json
+var contracts = require("../src/contracts");
+var accountContractJson =  contracts.accountContractJson;
+var channelContractJson =  contracts.channelContractJson;
+
+// sinon sandbox
+var sandbox;
 
 var ethers = sesamed._ethers;
 var pgp = sesamed.pgp;
@@ -28,8 +35,9 @@ var ipfs = sesamed.ipfs;
 describe("sesamed", async function () {
 
     let stubbedEthersContract;
-    let stubbedAccountContractRegister;
+    let stubbedContractRegister;
     let accountContractAddress = "accountContractAddress";
+    let channelContractAddress = "channelContractAddress";
     let stubbedProvider = "stubbedProvider";
     let myRpcUrl = "myRpcUrl";
     let myIpfsGateway = {test:"myIpfsGateway"};
@@ -48,15 +56,17 @@ describe("sesamed", async function () {
 
         stubbedEthersContract = sandbox.stub(ethers, "Contract");
         stubbedEthersContract.prototype.connect = sandbox.stub();
-        stubbedAccountContractRegister = sandbox.stub();
+        stubbedContractRegister = sandbox.stub();
         stubbedEthersContract.prototype.connect.returns({
             connect: stubbedEthersContract,
-            register: stubbedAccountContractRegister
+            register: stubbedContractRegister
         });
 
         sandbox.stub(ethers, "Wallet");
 
-        stubbedJsonRpcProvider = sandbox.stub(ethers.providers, "JsonRpcProvider");
+        stubbedJsonRpcProvider = sandbox.stub(ethers.providers, "JsonRpcProvider").returns({
+            getBlockNumber: sandbox.stub()
+        });
         stubbedJsonRpcProvider.prototype.test = sandbox.stub().returns(stubbedProvider);
 
 
@@ -64,7 +74,7 @@ describe("sesamed", async function () {
         }).returns(new Promise(resolve => {
             resolve({publicKey: "publicKey", privateKey: "privateKey"});
         }));
-        stubbedPgPgetPublicKeyFromPrivateKey = sandbox.stub(pgp, "getPublicKeyFromPrivateKey");
+        stubbedPgPgetPublicKeyFromPrivateKey = sandbox.stub(pgp, "getPublicKeyFromPrivateKey").returns("publicKey");
 
         stubbedEntropyToMnemonic = sandbox.stub(ethers.utils.HDNode, "entropyToMnemonic").returns("mnemonic");
         stubbedEthersWalletFromMnemonic = sandbox.stub(ethers.Wallet, "fromMnemonic").returns(testWallet);
@@ -96,40 +106,112 @@ describe("sesamed", async function () {
                 rpcUrl: myRpcUrl,
             });
 
-            stubbedJsonRpcProvider.should.have.been.calledWith(myRpcUrl);
+            return stubbedJsonRpcProvider.should.have.been.calledWith(myRpcUrl);
         });
 
         it("should use standard.rpcUrl if options.rpcUrl is not provided", function () {
             sesamed.init();
 
-            stubbedJsonRpcProvider.should.have.been.calledWith("https://rpc.sesamed.de");
+            return stubbedJsonRpcProvider.should.have.been.calledWith("https://rpc.sesamed.de");
         });
 
+        it("should call ethers.Contract thrice if account addresses are provided", function () {
+            sesamed.init({
+                rpcUrl: myRpcUrl,
+                accountContractAddress: accountContractAddress,
+                channelContractAddress: channelContractAddress,
+                ipfsGateway: myIpfsGateway
+            });
 
-        it("should use options correctly if provided", function () {
-            stubbedEthersContract.callsFake(fake);
+            return stubbedEthersContract.should.have.been.calledThrice;
+        });
 
+        it("should call ethers.Contract twice if no contract addresses are provided", function () {
+            sesamed.init({
+                rpcUrl: myRpcUrl,
+                ipfsGateway: myIpfsGateway
+            });
+
+            return stubbedEthersContract.should.have.been.calledThrice;
+        });
+
+        it("should call ethers.Contract first with correct params if accountContractAddress is provided", function () {
             sesamed.init({
                 rpcUrl: myRpcUrl,
                 accountContractAddress: accountContractAddress,
                 ipfsGateway: myIpfsGateway
             });
 
-            stubbedEthersContract.should.have.been.calledOnce;
-
-            function fake(param1, param2, param3) {
-                expect(param1).to.equal(accountContractAddress);
-                expect(param2).to.equal(accountContractJson.abi);
-                expect(param3.test()).to.equal(stubbedProvider);
-            }
+            return expect(stubbedEthersContract).to.have.been.first.calledWith(
+                accountContractAddress,
+                accountContractJson.abi
+            );
         });
 
-        it("should use default params for contract if options is not provided", function () {
-            sesamed.init();
+        it("should call ethers.Contract second with correct params if accountContractAddress is provided", function () {
+            sesamed.init({
+                rpcUrl: myRpcUrl,
+                accountContractAddress: accountContractAddress,
+                ipfsGateway: myIpfsGateway
+            });
+
+            return expect(stubbedEthersContract).to.have.been.second.calledWith(
+                channelContractJson.networks[219].address,
+                channelContractJson.abi,
+            );
+        });
+
+        it("should call ethers.Contract first with correct params if channelContractAddress is provided", function () {
+            sesamed.init({
+                rpcUrl: myRpcUrl,
+                channelContractAddress: channelContractAddress,
+                ipfsGateway: myIpfsGateway
+            });
+
+            return expect(stubbedEthersContract).to.have.been.second.calledWith(
+                accountContractJson.networks[219].address,
+                accountContractJson.abi,
+            );
+        });
+
+
+        it("should call ethers.Contract second with correct params if channelContractAddress is provided", function () {
+            sesamed.init({
+                rpcUrl: myRpcUrl,
+                channelContractAddress: channelContractAddress,
+                ipfsGateway: myIpfsGateway
+            });
+
+            return expect(stubbedEthersContract).to.have.been.second.calledWith(
+                channelContractAddress,
+                channelContractJson.abi
+            );
+        });
+
+
+        it("should use default params for accountContract if option is not provided", function () {
+            sesamed.init({
+                rpcUrl: myRpcUrl,
+                channelContractAddress: channelContractAddress,
+                ipfsGateway: myIpfsGateway
+            });
 
             return expect(stubbedEthersContract).to.be.calledWith(
                 accountContractJson.networks[219].address,
                 accountContractJson.abi,
+            );
+        });
+
+        it("should use default params for accountContract if option is not provided", function () {
+            sesamed.init({
+                rpcUrl: myRpcUrl,
+                accountContractAddress: accountContractAddress,
+                ipfsGateway: myIpfsGateway
+            });
+
+            return expect(stubbedEthersContract).to.be.calledWith(
+                channelContractJson.networks[219].address,
+                channelContractJson.abi,
             );
         });
 
@@ -278,6 +360,46 @@ describe("sesamed", async function () {
             });
 
             return expect(stubbedPgPgetPublicKeyFromPrivateKey).to.be.calledWith("privateKey", "mnemonic");
+        });
+
+        it("should set global.name", async function () {
+            delete global.name;
+
+            await sesamed.setAccount({
+                name: "alice", mnemonic: "mnemonic", privateKey: "privateKey"
+            });
+
+            return expect(global.name).to.equal("alice");
+        });
+
+        it("should set global.privateKey", async function () {
+            delete global.privateKey;
+
+            await sesamed.setAccount({
+                name: "alice", mnemonic: "mnemonic", privateKey: "privateKey"
+            });
+
+            return expect(global.privateKey).to.equal("privateKey");
+        });
+
+        it("should set global.passphrase", async function () {
+            delete global.passphrase;
+
+            await sesamed.setAccount({
+                name: "alice", mnemonic: "mnemonic", privateKey: "privateKey"
+            });
+
+            return expect(global.passphrase).to.equal("mnemonic");
+        });
+
+        it("should set global.publicKey", async function () {
+            delete global.publicKey;
+
+            await sesamed.setAccount({
+                name: "alice", mnemonic: "mnemonic", privateKey: "privateKey"
+            });
+
+            return expect(global.publicKey).to.equal("publicKey");
         });
 
     });

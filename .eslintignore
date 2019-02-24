@@ -1,1 +1,1 @@
-test/browserify/devlibs.js
+test/browserify/*.js

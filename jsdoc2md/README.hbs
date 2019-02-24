@@ -4,7 +4,7 @@
     </a>
 </h1>
 
-<h3 align="center">Sesamed - Blockchain for the  Healthcare System</h3>
+<h3 align="center">Sesamed - Blockchain for the  German Healthcare System</h3>
 
 <p align="center">
     <a href="https://www.redmedical.de"><img src="https://img.shields.io/badge/made%20by-RED%20Medical-blue.svg" /></a>
@@ -53,7 +53,7 @@ let sesamed = require("sesamed");
 ```
 
 # Contributing
-If you want to contribute you are welcome. Please regard the point below.
+If you want to contribute you are welcome. Please regard the points below.
 
 ## Committing
 
@@ -61,9 +61,25 @@ This project is based on [Karma Git Commit Convention](http://karma-runner.githu
 See their [commit history](https://github.com/karma-runner/karma/commits/master) for examples of properly-formatted
 commit messages.
 
+The change log is created by [Generate Changelog](https://github.com/lob/generate-changelog). They have an even longer
+list of commit types.
+
+## Testing
+
+**Write tests!** We enforce 100 % code coverage on this repo so any new code that gets written should have accompanying
+tests.
+
+```bash
+npm test
+```
+
+## Linting
+
+**Follow the linter.** We use ESlint, and we run `npm run lint` in our Travis builds.
+
 # API Reference
 
-## Standard functions
+## Standard
 
 {{#module name="sesamed"}}
     {{>body~}}
@@ -89,7 +105,7 @@ commit messages.
     {{>member-index~}}
 {{/module}}
 
-## Standard functions
+## Standard
 
 {{#module name="sesamed"}}
     {{>separator~}}
@@ -98,18 +114,29 @@ commit messages.
 
 ## Utilities
 
+### sesamed.pgp
+
 {{#module name="sesamed.pgp"}}
     {{>separator~}}
     {{>members~}}
 {{/module}}
+
+### sesamed.aes
+
 {{#module name="sesamed.aes"}}
     {{>separator~}}
     {{>members~}}
 {{/module}}
+
+### sesamed.ipfs
+
 {{#module name="sesamed.ipfs"}}
     {{>separator~}}
     {{>members~}}
 {{/module}}
+
+### sesamed.multihash
+
 {{#module name="sesamed.multihash"}}
     {{>separator~}}
     {{>members~}}

@@ -1,7 +1,7 @@
 pragma solidity >=0.4.22 <0.6.0;
 
 contract AccountContract {
-    function existsAccount(address _owner) public view returns (bool);
+    function existsAccount(address _owner, bytes32 _nameHash) public view returns (bool);
 }
 
 contract Channel {
@@ -20,12 +20,15 @@ contract Channel {
 
 
     event newChannelEvent (
-        bytes32 channelId,
-        string ciphertext
+        bytes32 indexed channelId,
+        string ciphertext,
+        string name
     );
 
-    function createChannel(bytes32 _channelId, string memory _ciphertext) public returns (bool) {
-        require(accountContract.existsAccount(msg.sender));
+    function register(bytes32 _channelId, string memory _ciphertext, string memory _name) public returns (bool) {
+        bytes32 nameHash = keccak256(bytes(_name));
+
+        require(accountContract.existsAccount(msg.sender, nameHash));
         require(!channel[_channelId].exists, "existsChannel");
 
         channelStruct memory newChannel;
@@ -35,7 +38,8 @@ contract Channel {
 
         emit newChannelEvent(
             _channelId,
-            _ciphertext
+            _ciphertext,
+            _name
         );
 
         return true;

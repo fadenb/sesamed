@@ -4,7 +4,7 @@
     </a>
 </h1>
 
-<h3 align="center">Sesamed - Blockchain for the  Healthcare System</h3>
+<h3 align="center">Sesamed - Blockchain for the  German Healthcare System</h3>
 
 <p align="center">
     <a href="https://www.redmedical.de"><img src="https://img.shields.io/badge/made%20by-RED%20Medical-blue.svg" /></a>
@@ -53,7 +53,7 @@ let sesamed = require("sesamed");
 ```
 
 # Contributing
-If you want to contribute you are welcome. Please regard the point below.
+If you want to contribute you are welcome. Please regard the points below.
 
 ## Committing
 
@@ -61,9 +61,21 @@ This project is based on [Karma Git Commit Convention](http://karma-runner.githu
 See their [commit history](https://github.com/karma-runner/karma/commits/master) for examples of properly-formatted
 commit messages.
 
+## Testing
+
+**Write tests!** We enforce 100 % code coverage on this repo so any new code that gets written should have accompanying tests.
+
+```bash
+npm test
+```
+
+## Linting
+
+**Follow the linter.** We use ESlint, and we run `npm run lint` in our Travis builds.
+
 # API Reference
 
-## Standard functions
+## Standard
 
     
 * [sesamed](#module_sesamed)
@@ -74,12 +86,19 @@ commit messages.
         * [Wallet](#Wallet) : <code>Object</code>
         * [PgpKeys](#PgpKeys) : <code>Object</code>
         * [IpfsGateway](#IpfsGateway) : <code>Object</code>
+        * [Channel](#Channel) : <code>Object</code>
+        * [Document](#Document) : <code>Object</code>
     * _static_
         * [.init([options])](#module_sesamed.init)
         * [.getNewAccount(name)](#module_sesamed.getNewAccount) ⇒ [<code>Account</code>](#Account)
         * [.setAccount(account)](#module_sesamed.setAccount)
-        * [.register()](#module_sesamed.register) ⇒ <code>Promise</code>
+        * [.register([waitForReceipt])](#module_sesamed.register) ⇒ <code>Promise</code>
         * [.getPublicKey(name)](#module_sesamed.getPublicKey) ⇒ <code>Promise</code>
+        * [.registerChannel(recipients, [waitForReceipt])](#module_sesamed.registerChannel) ⇒ <code>Promise</code>
+        * [.getNewAccountChannels()](#module_sesamed.getNewAccountChannels) ⇒ <code>Promise</code>
+        * [.sendDocument(channel, document, [waitForReceipt])](#module_sesamed.sendDocument) ⇒ <code>Promise</code>
+        * [.convertChannelsToObject(channels)](#module_sesamed.convertChannelsToObject) ⇒ <code>Object</code>
+        * [.convertChannelsToArray(channelsObj)](#module_sesamed.convertChannelsToArray) ⇒ [<code>Array.&lt;Channel&gt;</code>](#Channel)
 
 
 ## Utilities
@@ -110,11 +129,11 @@ commit messages.
     * [.getBase58FromMultihash(multihash)](#module_sesamed.multihash.getBase58FromMultihash) ⇒ <code>string</code>
 
 
-## Standard functions
+## Standard
 
 <a name="Multihash"></a>
 
-### Multihash : <code>Object</code>
+### MultiHash : <code>Object</code>
 **Kind**: global typedef of [<code>sesamed</code>](#module_sesamed)  
 **Properties**
 
@@ -165,11 +184,34 @@ commit messages.
 
 ### IpfsGateway : <code>Object</code>
 **Kind**: global typedef of [<code>sesamed</code>](#module_sesamed)  
-**Properry**: <code>Numver</code> port - the gateway port (i.e. 5001)  
+**Properry**: <code>Number</code> port - the gateway port (i.e. 5001)  
 **Properties**
 
 - host <code>String</code> - the host address (i.e. "ipfs.infura.io")  
 - protocol <code>String</code> - "https" / "http"  
+
+<a name="Channel"></a>
+
+### Channel : <code>Object</code>
+**Kind**: global typedef of [<code>sesamed</code>](#module_sesamed)  
+**Properties**
+
+- channelId <code>String</code> - the id of the channel  
+- aesKey <code>String</code> - the AES key of the channel  
+- tx <code>Object</code> - the transaction if channel was written  
+- receipt <code>Object</code> - the receipt if channel was written and waitForReceipt:true  
+
+<a name="Document"></a>
+
+### Document : <code>Object</code>
+**Kind**: global typedef of [<code>sesamed</code>](#module_sesamed)  
+**Properties**
+
+- channelId <code>String</code> - the id of the channel the document came from  
+- fileHash <code>String</code> - the hash of the encrypted document  
+- repo <code>Number</code> - the repo the document is stored (at the moment repo:1 (ipfs) is fixed  
+- aesKey <code>String</code> - the AES key of the channel can be temporarily part of the document  
+- data <code>String</code> - the data of the document in cleartext  
 
 <a name="module_sesamed.init"></a>
 
@@ -181,6 +223,8 @@ Initializes the configuration
 
 - [options] <code>Object</code>
     - [.accountContractAddress] <code>String</code> - the address of the account contract
+    - [.channelContractAddress] <code>String</code> - the address of the channel contract
+    - [.documentContractAddress] <code>String</code> - the address of the document contract
     - [.rpcUrl] <code>String</code> - the url of the rpc provider
     - [.ipfsGateway] [<code>IpfsGateway</code>](#IpfsGateway) - the ipfsGateway
 
@@ -215,12 +259,16 @@ sets an account to be used by sesamed
 
 <a name="module_sesamed.register"></a>
 
-### sesamed.register() ⇒ <code>Promise</code>
+### sesamed.register([waitForReceipt]) ⇒ <code>Promise</code>
 Registers a new account
 
 **Kind**: static method of [<code>sesamed</code>](#module_sesamed)  
-**Resolve**: <code>TxReceipt</code>  
+**Resolve**: <code>Object</code> returns the transaction or the receipt depending on waitForReceipt  
 **Reject**: <code>Error</code>  
+**Params**
+
+- [waitForReceipt] <code>boolean</code> - if true the receipt is returned else the transaction
+
 <a name="module_sesamed.getPublicKey"></a>
 
 ### sesamed.getPublicKey(name) ⇒ <code>Promise</code>
@@ -233,8 +281,66 @@ returns the public key of an Account
 
 - name <code>String</code> - the name of the account
 
+<a name="module_sesamed.registerChannel"></a>
+
+### sesamed.registerChannel(recipients, [waitForReceipt]) ⇒ <code>Promise</code>
+registers a new channel on the blockchain and returns the new channel
+
+**Kind**: static method of [<code>sesamed</code>](#module_sesamed)  
+**Resolve**: [<code>Channel</code>](#Channel)  
+**Reject**: <code>Error</code>  
+**Params**
+
+- recipients <code>String</code> | <code>Array.&lt;String&gt;</code> - the names of the recipients
+- [waitForReceipt] <code>Bool</code> - if true the returned channel contains a property "receipt"
+
+<a name="module_sesamed.getNewAccountChannels"></a>
+
+### sesamed.getNewAccountChannels() ⇒ <code>Promise</code>
+gets all new channels for the current account since startup
+
+**Kind**: static method of [<code>sesamed</code>](#module_sesamed)  
+**Resolve**: <code>Channel[]</code>  
+**Reject**: <code>Error</code>  
+<a name="module_sesamed.sendDocument"></a>
+
+### sesamed.sendDocument(channel, document, [waitForReceipt]) ⇒ <code>Promise</code>
+sends a document into a channel
+
+**Kind**: static method of [<code>sesamed</code>](#module_sesamed)  
+**Resolve**: <code>Objcect</code> the transaction or the receipt depending on waitForReceipt  
+**Params**
+
+- channel [<code>Channel</code>](#Channel) - the channel to which the document should be sent
+- document <code>String</code> - the document to be sent
+- [waitForReceipt] <code>Bool</code> - if true the receipt os returned else the the transaction
+
+<a name="module_sesamed.convertChannelsToObject"></a>
+
+### sesamed.convertChannelsToObject(channels) ⇒ <code>Object</code>
+converts an array of chanels into an object in which the channelID is the property and the value is the channel
+
+**Kind**: static method of [<code>sesamed</code>](#module_sesamed)  
+**Returns**: <code>Object</code> - channelsObj - {channelId1: {...}, channelId2, {...}, ...}  
+**Params**
+
+- channels [<code>Array.&lt;Channel&gt;</code>](#Channel)
+
+<a name="module_sesamed.convertChannelsToArray"></a>
+
+### sesamed.convertChannelsToArray(channelsObj) ⇒ [<code>Array.&lt;Channel&gt;</code>](#Channel)
+converts an object of chanels into an an array (see convertChannelsToObject())
+
+**Kind**: static method of [<code>sesamed</code>](#module_sesamed)  
+**Returns**: [<code>Array.&lt;Channel&gt;</code>](#Channel) - channels  
+**Params**
+
+- channelsObj <code>Object</code> - {channelId1: {...}, channelId2, {...}, ...}
+
 
 ## Utilities
+
+### sesamed.pgp
 
 <a name="module_sesamed.pgp.generateKeys"></a>
 
@@ -265,18 +371,18 @@ returns a the publicKey from a privateKey and a passphrase
 <a name="module_sesamed.pgp.encrypt"></a>
 
 ### sesamed.pgp.encrypt(options) ⇒ <code>Promise</code>
-Encrypts data with public key and signs if private key is provided
+Encrypts data with public key/keys and signs if private key is provided
 
 **Kind**: static method of [<code>sesamed.pgp</code>](#module_sesamed.pgp)  
-**Resolve**: <code>string</code> ciphertext  
+**Resolve**: <code>String</code> ciphertext  
 **Reject**: <code>Error</code>  
 **Params**
 
 - options <code>Object</code>
-    - .publicKey <code>String</code>
-    - .privateKey <code>String</code>
-    - .passphrase <code>String</code>
-    - .cleartext <code>String</code>
+    - .publicKey <code>String</code> | <code>Array.&lt;String&gt;</code> - the public key/keys to encrypt with
+    - [.privateKey] <code>String</code> - the private key to sign with
+    - [.passphrase] <code>String</code> - the passphrase of the private key
+    - .cleartext <code>String</code> - the cleartext to encrypt
 
 <a name="module_sesamed.pgp.decrypt"></a>
 
@@ -294,7 +400,10 @@ Decrypts data with private key and checks signature if public key is provided
     - [.publicKey] <code>String</code>
     - .ciphertext <code>String</code>
 
-    <a name="module_sesamed.aes.generateKey"></a>
+
+### sesamed.aes
+
+<a name="module_sesamed.aes.generateKey"></a>
 
 ### sesamed.aes.generateKey() ⇒ <code>Promise</code>
 Returns a base64 encoded AES key
@@ -340,7 +449,10 @@ AES-decryptfs cyphertext to cleartext with the given key
 - key <code>String</code>
 - ciphertext <code>String</code>
 
-    <a name="module_sesamed.ipfs.setGateway"></a>
+
+### sesamed.ipfs
+
+<a name="module_sesamed.ipfs.setGateway"></a>
 
 ### sesamed.ipfs.setGateway(ipfsGateway)
 sets the ipfs gateway
@@ -374,7 +486,10 @@ Reads data from the ipfs
 
 - fileHash <code>String</code> - the ipfs fileHash
 
-    <a name="module_sesamed.multihash.getMultihashFromBase58"></a>
+
+### sesamed.multihash
+
+<a name="module_sesamed.multihash.getMultihashFromBase58"></a>
 
 ### sesamed.multihash.getMultihashFromBase58(b58hash) ⇒ [<code>Multihash</code>](#Multihash)
 Partition multihash string into object representing multihash

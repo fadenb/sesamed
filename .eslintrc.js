@@ -13,7 +13,8 @@ module.exports = {
         artifacts: true,
         contract: true,
         assert: true,
-        web3: true
+        web3: true,
+        expect: true
     },
     parserOptions: {
         ecmaVersion: 2018
@@ -21,7 +22,8 @@ module.exports = {
     rules: {
         indent: [
             "error",
-            4
+            4,
+            {"SwitchCase": 1}
         ],
         "linebreak-style": [
             "error",
