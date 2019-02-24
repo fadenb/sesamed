@@ -13,6 +13,7 @@ contract("Sesamed",  function (accounts) {
         name1 = "Jochen",
         name2 = "Jan",
         name3 = "Katy",
+        name4 = "Jörg",
         hashedName1 = web3.utils.sha3(name1),
         hashedName2 = web3.utils.sha3(name2),
         hashedName3 = web3.utils.sha3(name3),
@@ -135,10 +136,10 @@ contract("Sesamed",  function (accounts) {
     });
 
     describe("Channel", async function () {
-        describe("createChannel", async function () {
-            it("should create channel12 from account1 successfully", async function () {
+        describe("register", async function () {
+            it("should register channel12 from account1 successfully", async function () {
 
-                let response = await channelContract.createChannel(channelId12, ciphertext12);
+                let response = await channelContract.register(channelId12, ciphertext12, name1);
                 truffleAssert.eventEmitted(response, "newChannelEvent", (ev) => {
                     return (
                         ev.channelId === channelId12
@@ -148,8 +149,8 @@ contract("Sesamed",  function (accounts) {
             });
 
 
-            it("should create channel31 from account3 successfully", async function () {
-                let response = await channelContract.createChannel(channelId31, ciphertext31, {from: account3});
+            it("should register channel31 from account3 successfully", async function () {
+                let response = await channelContract.register(channelId31, ciphertext31, name3, {from: account3});
                 truffleAssert.eventEmitted(response, "newChannelEvent", (ev) => {
                     return (
                         ev.channelId === channelId31
@@ -159,19 +160,27 @@ contract("Sesamed",  function (accounts) {
                 });
             });
 
-            it("should create channel31 from account2 and get reverted", async function () {
+            it("should register channel31 from account2 and get reverted", async function () {
                 let ciphertext = "cipher31";
 
                 await truffleAssert.fails(
-                    channelContract.createChannel(channelId31, ciphertext, {from: account2}),
+                    channelContract.register(channelId31, ciphertext, name2, {from: account2}),
                     truffleAssert.ErrorType.REVERT,
                     "existsChannel"
+                );
+            });
+
+            it("should register channel31 from account2 and get reverted", async function () {
+                await truffleAssert.fails(
+                    channelContract.register(channelId21, ciphertext21, name1, {from: account2}),
+                    truffleAssert.ErrorType.REVERT,
+                    "notExistsAccount"
 
                 );
             });
 
-            it("should create channel21 from account2 successfully", async function () {
-                let response = await channelContract.createChannel(channelId21, ciphertext21, {from: account2});
+            it("should register channel21 from account2 successfully", async function () {
+                let response = await channelContract.register(channelId21, ciphertext21, name2, {from: account2});
                 truffleAssert.eventEmitted(response, "newChannelEvent", (ev) => {
                     return (
                         ev.channelId === channelId21
@@ -182,11 +191,11 @@ contract("Sesamed",  function (accounts) {
             });
 
 
-            it("should create channel41 from (not registered) account4 an get reverted", async function () {
+            it("should register channel41 from (not registered) account4 an get reverted", async function () {
                 await truffleAssert.fails(
-                    channelContract.createChannel(channelId41, ciphertext41, {from: account4}),
+                    channelContract.register(channelId41, ciphertext41, name4, {from: account4}),
                     truffleAssert.ErrorType.REVERT,
-                    "notExistsAddress"
+                    "notExistsAccount"
                 );
             });
 
@@ -217,10 +226,10 @@ contract("Sesamed",  function (accounts) {
 
     describe("Document", async function () {
 
-        describe("sendDocument", async function () {
+        describe("send", async function () {
 
-            it("should sendDocument from account1 to channel12 successfully", async function () {
-                let response = await documentContract.sendDocument(channelId12, ipfsHash12, repo);
+            it("should send from account1 to channel12 successfully", async function () {
+                let response = await documentContract.send(channelId12, ipfsHash12, repo);
                 truffleAssert.eventEmitted(response, "newDocumentEvent", (ev) => {
                     return (
                         ev.channelId === channelId12
@@ -230,48 +239,48 @@ contract("Sesamed",  function (accounts) {
                 });
             });
 
-            it("sendDocument from account1 to channelId31 and get reverted", async function () {
+            it("send from account1 to channelId31 and get reverted", async function () {
                 await truffleAssert.fails(
-                    documentContract.sendDocument(channelId31, ipfsHash31, repo),
+                    documentContract.send(channelId31, ipfsHash31, repo),
                     truffleAssert.ErrorType.REVERT,
                     "notChannelOwner"
                 );
             });
 
-            it("sendDocument from account2 with channelId12 and get reverted", async function () {
+            it("send from account2 with channelId12 and get reverted", async function () {
                 await truffleAssert.fails(
-                    documentContract.sendDocument(channelId12, ipfsHash12, repo, {from: account2}),
+                    documentContract.send(channelId12, ipfsHash12, repo, {from: account2}),
                     truffleAssert.ErrorType.REVERT,
                     "notChannelOwner"
                 );
             });
 
-            it("sendDocument from account4 with channelId12 and get reverted", async function () {
+            it("send from account4 with channelId12 and get reverted", async function () {
                 await truffleAssert.fails(
-                    documentContract.sendDocument(channelId12, ipfsHash12, repo, {from: account4}),
+                    documentContract.send(channelId12, ipfsHash12, repo, {from: account4}),
                     truffleAssert.ErrorType.REVERT,
                     "notChannelOwner"
                 );
             });
 
-            it("sendDocument from account4 with channelId41 and get reverted", async function () {
+            it("send from account4 with channelId41 and get reverted", async function () {
                 await truffleAssert.fails(
-                    documentContract.sendDocument(channelId41, ipfsHash41, repo, {from: account4}),
+                    documentContract.send(channelId41, ipfsHash41, repo, {from: account4}),
                     truffleAssert.ErrorType.REVERT,
                     "notChannelOwner"
                 );
             });
 
-            it("sendDocument from account4 with channelId51 and get reverted", async function () {
+            it("send from account4 with channelId51 and get reverted", async function () {
                 await truffleAssert.fails(
-                    documentContract.sendDocument(channelId51, ipfsHash51, repo, {from: account4}),
+                    documentContract.send(channelId51, ipfsHash51, repo, {from: account4}),
                     truffleAssert.ErrorType.REVERT,
                     "notChannelOwner"
                 );
             });
 
-            it("should sendDocument from account2 to channel21 successfully", async function () {
-                let response = await documentContract.sendDocument(channelId21, ipfsHash21, repo, {from: account2});
+            it("should send from account2 to channel21 successfully", async function () {
+                let response = await documentContract.send(channelId21, ipfsHash21, repo, {from: account2});
                 truffleAssert.eventEmitted(response, "newDocumentEvent", (ev) => {
                     return (
                         ev.channelId === channelId21

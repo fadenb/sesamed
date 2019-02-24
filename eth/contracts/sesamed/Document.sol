@@ -18,7 +18,7 @@ contract Document {
         uint8 repo
     );
 
-    function sendDocument(bytes32 _channelId, string memory _fileHash, uint8 _repo) public returns (bool sucess) {
+    function send(bytes32 _channelId, string memory _fileHash, uint8 _repo) public returns (bool sucess) {
         require(channelContract.getChannelOwner(_channelId) == msg.sender, "notChannelOwner");
 
         emit newDocumentEvent (

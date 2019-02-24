@@ -52,16 +52,16 @@ async function getPublicKeyFromPrivateKey(privateKey, passphrase) {
 }
 
 /**
- * Encrypts data with public key and signs if private key is provided
+ * Encrypts data with public key/keys and signs if private key is provided
  * @alias module:"sesamed.pgp".encrypt
  * @memberof module:"sesamed.pgp"
  * @param {Object} options
- * @param {String} options.publicKey
- * @param {String} options.privateKey
- * @param {String} options.passphrase
- * @param {String} options.cleartext
+ * @param {String|String[]} options.publicKey - the public key/keys to encrypt with
+ * @param {String} [options.privateKey] - the private key to sign with
+ * @param {String} [options.passphrase] - the passphrase of the private key
+ * @param {String} options.cleartext - the cleartext to encrypt
  * @returns {Promise}
- * @resolve {string} ciphertext
+ * @resolve {String} ciphertext
  * @reject {Error}
  */
 async function encrypt(options) {

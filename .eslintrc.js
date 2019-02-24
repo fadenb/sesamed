@@ -13,7 +13,8 @@ module.exports = {
         artifacts: true,
         contract: true,
         assert: true,
-        web3: true
+        web3: true,
+        expect: true
     },
     parserOptions: {
         ecmaVersion: 2018
