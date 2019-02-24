@@ -16,7 +16,7 @@
     "browserifyTestsSesamed": "npx browserify test/sesamed.unit.test.js -o test/browserify/sesamed.unit.test.js",
     "browserifyTests": "npm run browserifyTestsSesamed && npm run browserifyTestsAes && npm run browserifyTestsPgp && npm run browserifyTestsMultihash",
     "browserify": "npx browserify src/sesamed.js -o dist/sesamed.js",
-    "docs": "npx jsdoc2md --property-list-format list --param-list-format list -t jsdoc2md/README.hbs src/*.js > README.md; echo",
+    "docs": "npx jsdoc2md --property-list-format list --param-list-format list -t jsdoc2md/README.hbs src/*.js > README.md && node jsdoc2md/afterCareDocs.js",
     "report-cover": "npx nyc report --reporter=text-lcov > coverage.lcov && npx codecov"
   },
   "version": "0.0.4",
@@ -61,6 +61,7 @@
     "jsdoc-to-markdown": "^4.0.1",
     "mocha": "^4.1.0",
     "nyc": "^13.3.0",
+    "replace-in-file": "^3.4.3",
     "rewire": "^4.0.1",
     "sinon": "^7.2.3",
     "sinon-chai": "^3.3.0",
