@@ -64,7 +64,9 @@ describe("sesamed", async function () {
 
         sandbox.stub(ethers, "Wallet");
 
-        stubbedJsonRpcProvider = sandbox.stub(ethers.providers, "JsonRpcProvider");
+        stubbedJsonRpcProvider = sandbox.stub(ethers.providers, "JsonRpcProvider").returns({
+            getBlockNumber: sandbox.stub()
+        });
         stubbedJsonRpcProvider.prototype.test = sandbox.stub().returns(stubbedProvider);
 
 
@@ -113,7 +115,7 @@ describe("sesamed", async function () {
             return stubbedJsonRpcProvider.should.have.been.calledWith("https://rpc.sesamed.de");
         });
 
-        it("should call ethers.Contract twice if account addresses are provided", function () {
+        it("should call ethers.Contract thrice if account addresses are provided", function () {
             sesamed.init({
                 rpcUrl: myRpcUrl,
                 accountContractAddress: accountContractAddress,
@@ -121,7 +123,7 @@ describe("sesamed", async function () {
                 ipfsGateway: myIpfsGateway
             });
 
-            return stubbedEthersContract.should.have.been.calledTwice;
+            return stubbedEthersContract.should.have.been.calledThrice;
         });
 
         it("should call ethers.Contract twice if no contract addresses are provided", function () {
@@ -130,7 +132,7 @@ describe("sesamed", async function () {
                 ipfsGateway: myIpfsGateway
             });
 
-            return stubbedEthersContract.should.have.been.calledTwice;
+            return stubbedEthersContract.should.have.been.calledThrice;
         });
 
         it("should call ethers.Contract first with correct params if accountContractAddress is provided", function () {
