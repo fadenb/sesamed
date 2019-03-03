@@ -38,7 +38,8 @@
     "url": "git+https://github.com/redmedical/sesamed.git"
   },
   "browser": {
-    "openpgp": "openpgp/dist/openpgp.min.js"
+    "openpgp": "openpgp/dist/openpgp.min.js",
+    "ethers": "ethers/dist/ethers.min.js"
   },
   "keywords": [
     "ethereum",
