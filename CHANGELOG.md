@@ -1,3 +1,16 @@
+#### 0.1.1 (2019-03-03)
+
+##### Chores
+
+*  use minified version of ether for browserify ([e7fd611c](https://github.com/redmedical/sesamed/commit/e7fd611c828e85ccfda141303c029db8d4f59b8a))
+*  set solc version fix to 0.5.0 ([f637f2e8](https://github.com/redmedical/sesamed/commit/f637f2e812dc31d1854f5917a5bd08228e7608b0))
+*  reorder scripts alphabetically / new scripts ([06082079](https://github.com/redmedical/sesamed/commit/0608207921ca342ca556e71c05fcfaa0a198fbb9))
+*  update npm packages ([709da5f0](https://github.com/redmedical/sesamed/commit/709da5f031383398f4a1ac778c2be72e33892c17))
+
+##### Bug Fixes
+
+*  moved go-ipfs to devDependecies ([aeca822b](https://github.com/redmedical/sesamed/commit/aeca822bb0f6b592d9915e78f6259d54b60e8a88))
+
 ### 0.1.0 (2019-03-03)
 
 ##### New Features
