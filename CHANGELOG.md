@@ -1,3 +1,9 @@
+### 0.1.0 (2019-03-03)
+
+##### New Features
+
+*  overall work on the whole project ([2cc47018](https://github.com/redmedical/sesamed/commit/2cc470180b0df2e184402310ec1d5767d9e9e83d))
+
 #### 0.0.5 (2019-02-24)
 
 ##### Chores
