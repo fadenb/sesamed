@@ -10,7 +10,9 @@ const Channel = artifacts.require("./Channel.sol");
 const Document = artifacts.require("./Document.sol");
 
 
-// helper functions
+const nameAlice = "Alice4";
+const nameBob = "Bob4";
+const nameChris = "Chris4";
 
 contract("Sesamed", function (accounts) {
     let accountContract;
@@ -19,6 +21,7 @@ contract("Sesamed", function (accounts) {
 
     class storage {
         constructor  () {
+            this.lastChannelBlockNumber = 0;
             this.writeChannelsObj = {};
             this.readChannelsObj = {};
         }
@@ -30,8 +33,6 @@ contract("Sesamed", function (accounts) {
     // let doris = new storage();
     // let ella = new storage();
 
-    let waitForReceipt = false;
-
     (async function () {
         accountContract = await Account.deployed();
         channelContract = await Channel.deployed();
@@ -42,6 +43,7 @@ contract("Sesamed", function (accounts) {
 
         it("sesamed.init()", async function () {
             await sesamed.init({
+                ipfsGateway: {host: "localhost", port: 5001, protocol: "http"},
                 rpcUrl: "http://localhost:8545",
                 accountContractAddress: accountContract.address,
                 channelContractAddress: channelContract.address,
@@ -55,7 +57,7 @@ contract("Sesamed", function (accounts) {
 
     async function registerAccount (name) {
         let account,
-            response;
+            receipt;
 
         // this creates a new account but is is not yet written to the blockchain
         it("sesamed.getNewAccount(" + name + ")", async function () {
@@ -72,6 +74,8 @@ contract("Sesamed", function (accounts) {
                     break;
             }
             counter++;
+
+            expect(account.name).to.equal(name);
         });
 
         // you must set the account to be able to read and write to the blockchain as that account
@@ -90,18 +94,19 @@ contract("Sesamed", function (accounts) {
 
         // now the new account is written to the blockchain
         it("sesamed.registerAccount()", async function () {
-            response = await sesamed.registerAccount(waitForReceipt);
+            receipt = await sesamed.registerAccount();
         });
 
         it("--------------------------------------", () => {
             mlog.log("      RESULT: ");
-            mlog.log("      - txHash : " + (response.hash || response.transactionHash));
-            mlog.log("      - gasUsed: " + (waitForReceipt ? response.gasUsed : " [no receipt]"));
+            mlog.log("      - txHash : " + receipt.transactionHash);
+            mlog.log("      - gasUsed: " + receipt.gasUsed);
+
+            expect(receipt.status).to.equal(1);
         });
     }
 
-    function registerChannelFromTo (from, recipients, channelName) {
-
+    function registerChannel (from, recipients, channelName) {
         let channel;
 
         it("setAccount(from.account)", async function () {
@@ -109,52 +114,58 @@ contract("Sesamed", function (accounts) {
         });
 
         it("registerChannel(recipients)", async function () {
-            channel = await sesamed.registerChannel(recipients, waitForReceipt);
+            channel = await sesamed.registerChannel(recipients);
             from.writeChannelsObj[channelName] = channel;
         });
 
         it("--------------------------------------", () => {
             mlog.log("      RESULT: ");
-            mlog.log("      - txHash: " + channel.tx);
-            mlog.log("      - gasUsed: " + (waitForReceipt ? channel.receipt.gasUsed : " [no receipt]"));
+            mlog.log("      - txHash: " + channel.receipt.transactionHash);
+            mlog.log("      - blockNumber: " + (channel.receipt.blockNumber));
+            mlog.log("      - gasUsed: " + channel.receipt.gasUsed);
             mlog.log("      - channeId: " + channel.channelId);
             mlog.log("      - aesKey  : " + channel.aesKey);
-        });
 
+            expect(channel.receipt.status).to.equal(1);
+        });
     }
 
-    function readChannelEventsFor (person) {
+    function readChannelEventsFor (person, expectedCount) {
+        let channels;
 
         it("setAccount(for.account)", async function () {
             await sesamed.setAccount(person.account);
         });
 
-        it("getNewAccountChannels()", async () => {
-            let channels = await sesamed.getNewAccountChannels();
+        it("getChannels()", async () => {
+            channels = await sesamed.getChannels(person.lastChannelBlockNumber + 1);
             channels.forEach(channel => {
                 person.readChannelsObj[channel.channelId] = channel;
             });
         });
 
-        it("--------------------------------------", () => {
-            let channelId;
-            let i = 1;
+        it("getBlockNumer()", async function () {
+            person.lastChannelBlockNumber = await sesamed.getBlockNumber();
+        });
 
+        it("--------------------------------------", () => {
             mlog.log("      RESULT: ");
-            for (channelId in person.readChannelsObj) {
-                let channel = person.readChannelsObj[channelId];
-                mlog.log("      " + i + ") -----------");
+            for (let i =0; i < channels.length; i++) {
+                let channel = channels[i];
+                mlog.log("      " + (i+1) + ") -----------");
                 mlog.log("      - channeId: " + channel.channelId);
                 mlog.log("      - aesKey  : " + channel.aesKey);
                 mlog.log("      - name    : " + channel.name);
                 i++;
             }
+
+            expect(expectedCount).to.equal(channels.length);
         });
 
     }
 
     function sendDocument (from, channelName, document) {
-        let response;
+        let receipt;
 
         it("setAccount(from.account)", async function () {
             await sesamed.setAccount(from.account);
@@ -162,21 +173,23 @@ contract("Sesamed", function (accounts) {
 
         it("send(channel, document)", async function () {
             let channel = from.writeChannelsObj[channelName];
-            response = await sesamed.sendDocument(channel, document, waitForReceipt);
+            receipt = await sesamed.sendDocument(channel, document);
         });
 
         it("--------------------------------------", () => {
             mlog.log("      RESULT: ");
-            mlog.log("      - txHash: " + (response.hash || response.transactionHash));
-            mlog.log("      - gasUsed: " + (waitForReceipt ? response.gasUsed : " [no receipt]"));
+            mlog.log("      - txHash: " + receipt.transactionHash);
+            mlog.log("      - gasUsed: " + receipt.gasUsed);
+
+            expect(receipt.status).to.equal(1);
         });
     }
     
-    function getTheChannelsOfAliceBobChris()  {
+    function getTheChannelsOfAliceBobChris(expA, expB, expC)  {
         describe("Alice", function () {
             
             describe("read channel events", () => {
-                readChannelEventsFor(alice);
+                readChannelEventsFor(alice, expA);
             });
             
         });
@@ -184,19 +197,19 @@ contract("Sesamed", function (accounts) {
         describe("Bob", function () {
             
             describe("read channel events", () => {
-                readChannelEventsFor(bob);
+                readChannelEventsFor(bob, expB);
             });
         });
 
         describe("Chris", function () {
             
             describe("read channel events", () => {
-                readChannelEventsFor(chris);
+                readChannelEventsFor(chris, expC);
             });
         });
     }
 
-    function getDocuments (person) {
+    function getDocuments (person, messages) {
 
         let documents;
 
@@ -205,7 +218,12 @@ contract("Sesamed", function (accounts) {
         });
 
         it("getDocuments(channelIds)", async function () {
-            documents = await sesamed.getDocuments(sesamed.convertChannelsToArray(person.readChannelsObj));
+            let channels = sesamed.convertChannelsToArray(person.readChannelsObj);
+            documents = await sesamed.getDocuments(channels, person.lastDocumentBlockNumber + 1);
+        });
+
+        it("getBlockNumer()", async function () {
+            person.lastDocumentBlockNumber = await sesamed.getBlockNumber();
         });
 
         it("--------------------------------------", () => {
@@ -214,23 +232,50 @@ contract("Sesamed", function (accounts) {
                 mlog.log("      " + (i+1) + ") -----------");
                 mlog.log("      - channelId: " + documents[i].channelId);
                 mlog.log("      - fileHash : " + documents[i].fileHash);
-                mlog.log("      - repo     : " + documents[i].repo);
                 mlog.log("      - data     : " + documents[i].data);
+
+                expect(messages[i]).to.equal(documents[i].data);
             }
         });
 
     }
 
+    function getDocumentsForAllThree(msgsA, msgsB, msgsC) {
+        describe("Alice", function () {
+
+            describe("get document sent to Alice", () => {
+                getDocuments(alice, msgsA);
+            });
+
+        });
+
+        describe("Bob", function () {
+
+            describe("get document sent to Bob", () => {
+                getDocuments(bob, msgsB);
+            });
+
+        });
+
+        describe("Chris", function () {
+
+            describe("get document sent to Chris", () => {
+                getDocuments(chris, msgsC);
+            });
+
+        });
+    }
+
     describe("Alice", function () {
-        registerAccount("alice");
+        registerAccount(nameAlice);
     });
 
     describe("Bob", function () {
-        registerAccount("bob");
+        registerAccount(nameBob);
     });
 
     describe("Chris", function () {
-        registerAccount("chris");
+        registerAccount(nameChris);
     });
 
     describe("Establish first Channel", () => {
@@ -238,14 +283,14 @@ contract("Sesamed", function (accounts) {
         describe("Alice", function () {
 
             describe("register channel to Bob", () => {
-                registerChannelFromTo(alice, "bob", "toBob");
+                registerChannel(alice, nameBob, "toBob");
             });
 
         });
 
         describe("getting the channels for all three", () => {
 
-            getTheChannelsOfAliceBobChris();
+            getTheChannelsOfAliceBobChris(0, 1, 0);
 
         });
 
@@ -255,13 +300,13 @@ contract("Sesamed", function (accounts) {
 
         describe("Alice", function () {
             describe("register channel to Chris", () => {
-                registerChannelFromTo(alice, "chris", "toChris");
+                registerChannel(alice, nameChris, "toChris");
             });
         });
         
         describe("getting the channels for all three", () => {
 
-            getTheChannelsOfAliceBobChris();
+            getTheChannelsOfAliceBobChris(0, 0, 1);
             
         }); 
 
@@ -271,60 +316,112 @@ contract("Sesamed", function (accounts) {
 
         describe("Chris", function () {
             describe("register channel to Bob", () => {
-                registerChannelFromTo(chris, "bob", "toBob");
+                registerChannel(chris, nameBob, "toBob");
             });
         });
 
         describe("getting the channels for all three", () => {
 
-            getTheChannelsOfAliceBobChris();
+            getTheChannelsOfAliceBobChris(0, 1, 0);
 
         });
 
     });
 
-    describe("Alice", function () {
+    describe("sending documents first round", () => {
 
-        describe("send document to Bob (Hello, Bob!)", () => {
-            sendDocument(alice, "toBob", "Hello, Bob!");
-        });
+        describe("Alice", function () {
 
-        describe("send document to Chris (Hello, Chris!)", () => {
-            sendDocument(alice, "toChris", "Hello, Chris!");
-        });
+            describe("send document to Bob (Hello, Bob!)", () => {
+                sendDocument(alice, "toBob", "Hello, Bob!");
+            });
 
+            describe("send document to Chris (Hello, Chris!)", () => {
+                sendDocument(alice, "toChris", "Hello, Chris!");
+            });
 
-    });
-
-    describe("Chris", function () {
-
-        describe("send document to Chris (Hello, Bob! Here is Chris.)", () => {
-            sendDocument(chris, "toBob", "Hello, Bob! Here is Chris.");
         });
 
     });
 
-    describe("Alice", function () {
+    describe("receiving documents of first round", () => {
 
-        describe("get document sent to Alice", () => {
-            getDocuments(alice);
+        getDocumentsForAllThree([],["Hello, Bob!"], ["Hello, Chris!"]);
+
+    });
+
+    describe("sending documents second round", () => {
+
+        describe("Chris", function () {
+
+            describe("send document to Bob (Hello, Bob! Here is Chris.)", () => {
+                sendDocument(chris, "toBob", "Hello, Bob! Here is Chris.");
+            });
+
         });
 
     });
 
-    describe("Bob", function () {
+    describe("receiving documents of second round", () => {
 
-        describe("get document sent to Bob", () => {
-            getDocuments(bob);
+        getDocumentsForAllThree([], ["Hello, Bob! Here is Chris."], []);
+
+    });
+
+    describe("register new channel from bob to alice and chris", () => {
+
+        it("setAccount(from.account)", async function () {
+            await sesamed.setAccount(bob.account);
+        });
+
+        it("registerChannel(recipients)", async function () {
+            let channel = await sesamed.registerChannel([nameAlice, nameChris]);
+            bob.writeChannelsObj["toAliceAndChris"] = channel;
         });
 
     });
 
-    describe("Chris", function () {
+    describe("sending documents third round", () => {
 
-        describe("get document sent to Chris", () => {
-            getDocuments(chris);
+        describe("Alice", function () {
+
+            describe("send document to Bob (Hello, Bob!)", () => {
+                sendDocument(alice, "toBob", "Hello, Bob! Here Alice. Third round message!!!");
+            });
+
+            describe("send document to Chris (Hello, Chris!)", () => {
+                sendDocument(alice, "toChris", "Hello, Chris! Here Alice. Third round message");
+            });
+
         });
+
+        describe("Bob", function () {
+
+            describe("send document to Alice and Chris (Hello, U2! Here is Bob.)", () => {
+
+                sendDocument(bob, "toAliceAndChris", "Hello, U2! Here is Bob.");
+            });
+
+        });
+
+        describe("Chris", function () {
+
+            describe("send document to Bob (Hello, Bob! Here is Chris.)", () => {
+                sendDocument(chris, "toBob", "Hello, Bob! Here is Chris. Third round message");
+            });
+
+        });
+
+        describe("receiving documents of third round", () => {
+
+            getDocumentsForAllThree(
+                ["Hello, U2! Here is Bob."],
+                ["Hello, Bob! Here Alice. Third round message!!!", "Hello, Bob! Here is Chris. Third round message"],
+                ["Hello, Chris! Here Alice. Third round message", "Hello, U2! Here is Bob."]
+            );
+
+        });
+
 
     });
 

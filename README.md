@@ -1,5 +1,5 @@
 <h1 align="center">
-    <a href="https://ipfs.io">
+    <a href="https://www.redmedical.de">
         <img src="https://ipfs.io/ipfs/QmcFCZqMQi8jP2TkdicBzWVoeDosmdsftAqTaLNY7kH5yV" alt="Sesamed logo" />
     </a>
 </h1>
@@ -61,9 +61,13 @@ This project is based on [Karma Git Commit Convention](http://karma-runner.githu
 See their [commit history](https://github.com/karma-runner/karma/commits/master) for examples of properly-formatted
 commit messages.
 
+The change log is created by [Generate Changelog](https://github.com/lob/generate-changelog). They have an even longer
+list of commit types.
+
 ## Testing
 
-**Write tests!** We enforce 100 % code coverage on this repo so any new code that gets written should have accompanying tests.
+**Write tests!** We enforce 100 % code coverage on this repo so any new code that gets written should have accompanying
+tests.
 
 ```bash
 npm test
@@ -92,13 +96,14 @@ npm test
         * [.init([options])](#module_sesamed.init)
         * [.getNewAccount(name)](#module_sesamed.getNewAccount) ⇒ [<code>Account</code>](#Account)
         * [.setAccount(account)](#module_sesamed.setAccount)
-        * [.register([waitForReceipt])](#module_sesamed.register) ⇒ <code>Promise</code>
+        * [.register()](#module_sesamed.register) ⇒ <code>Promise</code>
         * [.getPublicKey(name)](#module_sesamed.getPublicKey) ⇒ <code>Promise</code>
-        * [.registerChannel(recipients, [waitForReceipt])](#module_sesamed.registerChannel) ⇒ <code>Promise</code>
-        * [.getNewAccountChannels()](#module_sesamed.getNewAccountChannels) ⇒ <code>Promise</code>
-        * [.sendDocument(channel, document, [waitForReceipt])](#module_sesamed.sendDocument) ⇒ <code>Promise</code>
+        * [.registerChannel(recipients)](#module_sesamed.registerChannel) ⇒ <code>Promise</code>
+        * [.getChannels([startBlockNumber])](#module_sesamed.getChannels) ⇒ <code>Promise</code>
+        * [.sendDocument(channel, document)](#module_sesamed.sendDocument) ⇒ <code>Promise</code>
         * [.convertChannelsToObject(channels)](#module_sesamed.convertChannelsToObject) ⇒ <code>Object</code>
         * [.convertChannelsToArray(channelsObj)](#module_sesamed.convertChannelsToArray) ⇒ [<code>Array.&lt;Channel&gt;</code>](#Channel)
+        * [.getBlockNumber()](#module_sesamed.getBlockNumber) ⇒ <code>Promise</code>
 
 
 ## Utilities
@@ -141,6 +146,10 @@ npm test
 - hashFunction <code>number</code> - The hash function code for the function used  
 - size <code>number</code> - The length of digest  
 
+**Example**  
+```js
+ // example will follow
+ ```
 <a name="Account"></a>
 
 ### Account : <code>Object</code>
@@ -151,6 +160,10 @@ npm test
 - address <code>String</code> - the address of the account  
 - privateKey <code>String</code> - the privateKey of the account  
 
+**Example**  
+```js
+ // example will follow
+ ```
 <a name="UserIds"></a>
 
 ### UserIds : <code>Object</code>
@@ -160,6 +173,10 @@ npm test
 - name <code>String</code> - the account name  
 - email <code>String</code> - the email of the account  
 
+**Example**  
+```js
+ // example will follow
+ ```
 <a name="Wallet"></a>
 
 ### Wallet : <code>Object</code>
@@ -171,6 +188,10 @@ npm test
 - privateKey <code>String</code> - the private key of the account  
 - address <code>String</code> - the address of the account  
 
+**Example**  
+```js
+ // example will follow
+ ```
 <a name="PgpKeys"></a>
 
 ### PgpKeys : <code>Object</code>
@@ -180,16 +201,24 @@ npm test
 - privateKey <code>String</code> - the private pgp key  
 - publicKey <code>String</code> - the public pgp key  
 
+**Example**  
+```js
+ // example will follow
+ ```
 <a name="IpfsGateway"></a>
 
 ### IpfsGateway : <code>Object</code>
 **Kind**: global typedef of [<code>sesamed</code>](#module_sesamed)  
-**Properry**: <code>Number</code> port - the gateway port (i.e. 5001)  
 **Properties**
 
 - host <code>String</code> - the host address (i.e. "ipfs.infura.io")  
+- port <code>Number</code> - the gateway port (i.e. 5001)  
 - protocol <code>String</code> - "https" / "http"  
 
+**Example**  
+```js
+ // example will follow
+ ```
 <a name="Channel"></a>
 
 ### Channel : <code>Object</code>
@@ -198,9 +227,15 @@ npm test
 
 - channelId <code>String</code> - the id of the channel  
 - aesKey <code>String</code> - the AES key of the channel  
-- tx <code>Object</code> - the transaction if channel was written  
-- receipt <code>Object</code> - the receipt if channel was written and waitForReceipt:true  
+- ciphertext <code>String</code> - contains the encrypted aesKey and name (seperated by a space)  
+- name <code>String</code> - the name of the sender  
+- nameHash <code>String</code> - the hash of the name of the sender  
+- receipt <code>Object</code> - the receipt of the transaction  
 
+**Example**  
+```js
+ // example will follow
+ ```
 <a name="Document"></a>
 
 ### Document : <code>Object</code>
@@ -208,11 +243,14 @@ npm test
 **Properties**
 
 - channelId <code>String</code> - the id of the channel the document came from  
-- fileHash <code>String</code> - the hash of the encrypted document  
-- repo <code>Number</code> - the repo the document is stored (at the moment repo:1 (ipfs) is fixed  
+- fileHash <code>String</code> - the hash of the encrypted document (digest of multihash)  
 - aesKey <code>String</code> - the AES key of the channel can be temporarily part of the document  
 - data <code>String</code> - the data of the document in cleartext  
 
+**Example**  
+```js
+ // example will follow
+ ```
 <a name="module_sesamed.init"></a>
 
 ### sesamed.init([options])
@@ -228,6 +266,14 @@ Initializes the configuration
     - [.rpcUrl] <code>String</code> - the url of the rpc provider
     - [.ipfsGateway] [<code>IpfsGateway</code>](#IpfsGateway) - the ipfsGateway
 
+**Example**  
+```js
+ // init without any options
+ sesamed.init();
+
+ // init with a different ipfsGateway
+ sesamed.init({ipfsGateway: {host: "ipfs.infura.io", port: 5001, protocol: "https"}});
+ ```
 <a name="module_sesamed.getNewAccount"></a>
 
 ### sesamed.getNewAccount(name) ⇒ [<code>Account</code>](#Account)
@@ -241,12 +287,8 @@ creates a new account and sets
 
 **Example**  
 ```js
-> sesamed.getNewAccount()
-{
-    wallet: {},
-    pgp: {}
-}
-```
+ sesamed.getNewAccount()
+ ```
 <a name="module_sesamed.setAccount"></a>
 
 ### sesamed.setAccount(account)
@@ -257,18 +299,22 @@ sets an account to be used by sesamed
 
 - account [<code>Account</code>](#Account)
 
+**Example**  
+```js
+ // example will follow
+ ```
 <a name="module_sesamed.register"></a>
 
-### sesamed.register([waitForReceipt]) ⇒ <code>Promise</code>
+### sesamed.register() ⇒ <code>Promise</code>
 Registers a new account
 
 **Kind**: static method of [<code>sesamed</code>](#module_sesamed)  
-**Resolve**: <code>Object</code> returns the transaction or the receipt depending on waitForReceipt  
+**Resolve**: <code>Object</code> returns the receipt  
 **Reject**: <code>Error</code>  
-**Params**
-
-- [waitForReceipt] <code>boolean</code> - if true the receipt is returned else the transaction
-
+**Example**  
+```js
+ // example will follow
+ ```
 <a name="module_sesamed.getPublicKey"></a>
 
 ### sesamed.getPublicKey(name) ⇒ <code>Promise</code>
@@ -281,40 +327,58 @@ returns the public key of an Account
 
 - name <code>String</code> - the name of the account
 
+**Example**  
+```js
+ // example will follow
+ ```
 <a name="module_sesamed.registerChannel"></a>
 
-### sesamed.registerChannel(recipients, [waitForReceipt]) ⇒ <code>Promise</code>
+### sesamed.registerChannel(recipients) ⇒ <code>Promise</code>
 registers a new channel on the blockchain and returns the new channel
 
 **Kind**: static method of [<code>sesamed</code>](#module_sesamed)  
-**Resolve**: [<code>Channel</code>](#Channel)  
+**Resolve**: [<code>Channel</code>](#Channel) the new Channel - consists of an additional property "receipt"  
 **Reject**: <code>Error</code>  
 **Params**
 
 - recipients <code>String</code> | <code>Array.&lt;String&gt;</code> - the names of the recipients
-- [waitForReceipt] <code>Bool</code> - if true the returned channel contains a property "receipt"
 
-<a name="module_sesamed.getNewAccountChannels"></a>
+**Example**  
+```js
+ // example will follow
+ ```
+<a name="module_sesamed.getChannels"></a>
 
-### sesamed.getNewAccountChannels() ⇒ <code>Promise</code>
-gets all new channels for the current account since startup
+### sesamed.getChannels([startBlockNumber]) ⇒ <code>Promise</code>
+gets all new channels for the current account since the given start block
 
 **Kind**: static method of [<code>sesamed</code>](#module_sesamed)  
 **Resolve**: <code>Channel[]</code>  
 **Reject**: <code>Error</code>  
+**Params**
+
+- [startBlockNumber] <code>Number</code> - the block number to start with (default: 0)
+
+**Example**  
+```js
+ // example will follow
+ ```
 <a name="module_sesamed.sendDocument"></a>
 
-### sesamed.sendDocument(channel, document, [waitForReceipt]) ⇒ <code>Promise</code>
+### sesamed.sendDocument(channel, document) ⇒ <code>Promise</code>
 sends a document into a channel
 
 **Kind**: static method of [<code>sesamed</code>](#module_sesamed)  
-**Resolve**: <code>Objcect</code> the transaction or the receipt depending on waitForReceipt  
+**Resolve**: <code>Object</code> the receipt of the transaction  
 **Params**
 
 - channel [<code>Channel</code>](#Channel) - the channel to which the document should be sent
 - document <code>String</code> - the document to be sent
-- [waitForReceipt] <code>Bool</code> - if true the receipt os returned else the the transaction
 
+**Example**  
+```js
+ // example will follow
+ ```
 <a name="module_sesamed.convertChannelsToObject"></a>
 
 ### sesamed.convertChannelsToObject(channels) ⇒ <code>Object</code>
@@ -337,6 +401,23 @@ converts an object of chanels into an an array (see convertChannelsToObject())
 
 - channelsObj <code>Object</code> - {channelId1: {...}, channelId2, {...}, ...}
 
+**Example**  
+```js
+ // example will follow
+ ```
+<a name="module_sesamed.getBlockNumber"></a>
+
+### sesamed.getBlockNumber() ⇒ <code>Promise</code>
+returns the current block number
+
+**Kind**: static method of [<code>sesamed</code>](#module_sesamed)  
+**Resolve**: <code>Number</code> the current block number  
+**Example**  
+```js
+ sesamed.getBlockNumber().then((blockNumber) => {
+     console.log("Current block number: " + blockNumber);
+ });
+ ```
 
 ## Utilities
 
@@ -355,6 +436,10 @@ Creates a new pgp key pair
 - name <code>String</code> - the name associated with the pgp keys
 - passphrase <code>String</code> - the passphrase protecting the private key
 
+**Example**  
+```js
+ // example will follow
+ ```
 <a name="module_sesamed.pgp.getPublicKeyFromPrivateKey"></a>
 
 ### sesamed.pgp.getPublicKeyFromPrivateKey(privateKey, passphrase) ⇒ <code>Promise</code>
@@ -368,6 +453,10 @@ returns a the publicKey from a privateKey and a passphrase
 - privateKey <code>String</code>
 - passphrase <code>String</code>
 
+**Example**  
+```js
+ // example will follow
+ ```
 <a name="module_sesamed.pgp.encrypt"></a>
 
 ### sesamed.pgp.encrypt(options) ⇒ <code>Promise</code>
@@ -384,6 +473,10 @@ Encrypts data with public key/keys and signs if private key is provided
     - [.passphrase] <code>String</code> - the passphrase of the private key
     - .cleartext <code>String</code> - the cleartext to encrypt
 
+**Example**  
+```js
+ // example will follow
+ ```
 <a name="module_sesamed.pgp.decrypt"></a>
 
 ### sesamed.pgp.decrypt(options) ⇒ <code>Promise</code>
@@ -400,6 +493,10 @@ Decrypts data with private key and checks signature if public key is provided
     - [.publicKey] <code>String</code>
     - .ciphertext <code>String</code>
 
+**Example**  
+```js
+ // example will follow
+ ```
 
 ### sesamed.aes
 
@@ -411,6 +508,10 @@ Returns a base64 encoded AES key
 **Kind**: static method of [<code>sesamed.aes</code>](#module_sesamed.aes)  
 **Resolve**: <code>String</code> key - a base64 encoded AES key  
 **Reject**: <code>Error</code> - this should not happen  
+**Example**  
+```js
+ // example will follow
+ ```
 <a name="module_sesamed.aes.importKey"></a>
 
 ### sesamed.aes.importKey(key) ⇒ <code>Promise</code>
@@ -423,6 +524,10 @@ imports a base64 encoded key into a CryptoKey
 
 - key <code>string</code> - the base64 encoded AES key
 
+**Example**  
+```js
+ // example will follow
+ ```
 <a name="module_sesamed.aes.encrypt"></a>
 
 ### sesamed.aes.encrypt(key, cleartext) ⇒ <code>Promise</code>
@@ -436,6 +541,10 @@ AES-encrypts cleartext to cyphertext with the given key
 - key <code>String</code>
 - cleartext <code>String</code>
 
+**Example**  
+```js
+ // example will follow
+ ```
 <a name="module_sesamed.aes.decrypt"></a>
 
 ### sesamed.aes.decrypt(key, ciphertext) ⇒ <code>Promise</code>
@@ -449,6 +558,10 @@ AES-decryptfs cyphertext to cleartext with the given key
 - key <code>String</code>
 - ciphertext <code>String</code>
 
+**Example**  
+```js
+ // example will follow
+ ```
 
 ### sesamed.ipfs
 
@@ -462,6 +575,10 @@ sets the ipfs gateway
 
 - ipfsGateway <code>String</code>
 
+**Example**  
+```js
+ // example will follow
+ ```
 <a name="module_sesamed.ipfs.write"></a>
 
 ### sesamed.ipfs.write(data) ⇒ <code>Promise</code>
@@ -474,6 +591,10 @@ Writes data to the ipfs
 
 - data <code>String</code> - the data to be written
 
+**Example**  
+```js
+ // example will follow
+ ```
 <a name="module_sesamed.ipfs.read"></a>
 
 ### sesamed.ipfs.read(fileHash) ⇒ <code>Promise</code>
@@ -486,6 +607,10 @@ Reads data from the ipfs
 
 - fileHash <code>String</code> - the ipfs fileHash
 
+**Example**  
+```js
+ // example will follow
+ ```
 
 ### sesamed.multihash
 
@@ -499,6 +624,10 @@ Partition multihash string into object representing multihash
 
 - b58hash <code>string</code> - A base58 encoded multihash string
 
+**Example**  
+```js
+ // example will follow
+ ```
 <a name="module_sesamed.multihash.getBase58FromMultihash"></a>
 
 ### sesamed.multihash.getBase58FromMultihash(multihash) ⇒ <code>string</code>
@@ -508,8 +637,12 @@ Encode a multihash structure into base58 encoded multihash string
 **Returns**: <code>string</code> - base58 encoded multihash string  
 **Params**
 
-- multihash [<code>Multihash</code>](#Multihash)
+- multihash [<code>Multihash</code>](#Multihash) | <code>String</code> - the multihash or the digest (hash function and size are then default)
 
+**Example**  
+```js
+ // example will follow
+ ```
 
 * * *
 

@@ -1,51 +1,60 @@
-pragma solidity >=0.4.22 <0.6.0;
+pragma solidity 0.5.0;
 
 contract Account {
 
-    struct AdressStruct {
+    struct AccountStruct {
         address owner;
+        bytes32 fileHash;
         bool    exists;
     }
 
     mapping(address => bool) existsAddress;
-    mapping(bytes32 => AdressStruct) existsName;
+    mapping(bytes32 => AccountStruct) accounts;
 
     event newAccountEvent (
         bytes32 indexed nameHash,
-        string fileHash,
-        uint8 repo
+        bytes32 fileHash
     );
-
 
     constructor () public {}
 
-    function register(string memory _name, string memory _fileHash, uint8 _repo) public returns (bool success) {
-        bytes32 nameHash = keccak256(bytes(_name));
-        AdressStruct memory addressStruct;
+    function register(bytes32 _nameHash, bytes32 _fileHash) public returns (bool success) {
+        AccountStruct memory accountStruct;
 
+        // check if this address has already an account
         require(!existsAddress[msg.sender], "existsAddress");
-        require(!existsName[nameHash].exists, "existsName");
 
+        // check if the given name (=nameHash) is already taken
+        require(!accounts[_nameHash].exists, "existsName");
+
+        // set the address as taken
         existsAddress[msg.sender] = true;
 
-        addressStruct.owner = msg.sender;
-        addressStruct.exists = true;
+        // set the account
+        accountStruct.owner = msg.sender;
+        accountStruct.fileHash = _fileHash;
+        accountStruct.exists = true;
+        accounts[_nameHash] = accountStruct;
 
-        existsName[nameHash] = addressStruct;
-
+        // emit the new account
         emit newAccountEvent(
-            nameHash,
-            _fileHash,
-            _repo
+            _nameHash,
+            _fileHash
         );
 
         return true;
     }
 
     function existsAccount(address _owner, bytes32 _nameHash) public view returns (bool) {
-        require(existsName[_nameHash].owner == _owner, "notExistsAccount");
+        require(accounts[_nameHash].owner == _owner, "notExistsAccount");
 
         return true;
+    }
+
+    function getFileHash(bytes32 _nameHash) public view returns (bytes32) {
+        require(accounts[_nameHash].exists, "notExistsAccount");
+
+        return accounts[_nameHash].fileHash;
     }
 }
 

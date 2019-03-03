@@ -14,6 +14,10 @@ const openpgp = require("openpgp");
  * @returns {Promise}
  * @resolve {PgpKeys} pgpKeys
  * @reject {Error}
+ * @example
+ ```js
+ // example will follow
+ ```
  */
 function generateKeys(name, passphrase) {
     if (!name || !passphrase || typeof name !== "string" || typeof passphrase !== "string") {
@@ -43,6 +47,10 @@ function generateKeys(name, passphrase) {
  * @returns {Promise}
  * @resolve {String} publicKey
  * @reject {Error}
+ * @example
+ ```js
+ // example will follow
+ ```
  */
 async function getPublicKeyFromPrivateKey(privateKey, passphrase) {
     let privateKeyObj = (await openpgp.key.readArmored(privateKey)).keys[0];
@@ -63,6 +71,10 @@ async function getPublicKeyFromPrivateKey(privateKey, passphrase) {
  * @returns {Promise}
  * @resolve {String} ciphertext
  * @reject {Error}
+ * @example
+ ```js
+ // example will follow
+ ```
  */
 async function encrypt(options) {
     let privateKey,
@@ -88,9 +100,17 @@ async function encrypt(options) {
         publicKeys: publicKeys,
         privateKeys: privateKeys,
         compression: openpgp.enums.compression.zip
-    }).then(ciphertext => ciphertext.data);
+    }).then(ciphertext => {return deflateCiphertext(ciphertext.data);});
 }
 
+/**
+ * removes the header and footer and all CR/LF from the ciphertext to use less space
+ * @param {String} ciphertext - the full blown pgp ciphertext
+ * @returns {String} ciphertext - the deflated ciphertext
+ */
+function deflateCiphertext(ciphertext) {
+    return ciphertext.replace(/(-----BEGIN PGP MESSAGE-----\r\nVersion: OpenPGP.js v4.4.7\r\nComment: https:\/\/openpgpjs.org\r\n\r\n|\r\n-----END PGP MESSAGE-----\r\n|\r\n)/g, "");
+}
 /**
  * Decrypts data with private key and checks signature if public key is provided
  * @alias module:"sesamed.pgp".decrypt
@@ -103,6 +123,10 @@ async function encrypt(options) {
  * @returns {Promise}
  * @resolve {string} cleartext
  * @reject {Error}
+ * @example
+ ```js
+ // example will follow
+ ```
  */
 async function decrypt(options) {
     let privateKey = (await openpgp.key.readArmored(options.privateKey)).keys[0],
@@ -115,7 +139,7 @@ async function decrypt(options) {
     }
 
     return openpgp.decrypt({
-        message: await openpgp.message.readArmored(options.ciphertext),
+        message: await openpgp.message.readArmored(inflateCiphertext(options.ciphertext)),
         publicKeys: publicKeys,
         privateKeys: privateKey
     }).then(async plaintext => {
@@ -128,6 +152,15 @@ async function decrypt(options) {
         }
         return plaintext.data;
     });
+}
+
+/**
+ * returns a full blown pgp message with correct header and footer
+ * @param {String} ciphertext - the deflated ciphertext without header and footer
+ * @returns {String} ciphertext - the inflated ciphertext with header and footer
+ */
+function inflateCiphertext(ciphertext) {
+    return "-----BEGIN PGP MESSAGE-----\n\n" + ciphertext + "\n-----END PGP MESSAGE-----";
 }
 
 /**
