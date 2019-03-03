@@ -19,7 +19,7 @@
     "docs": "npx jsdoc2md --property-list-format list --param-list-format list -t jsdoc2md/README.hbs src/*.js > README.md && node jsdoc2md/afterCareDocs.js",
     "report-cover": "npx nyc report --reporter=text-lcov > coverage.lcov && npx codecov"
   },
-  "version": "0.0.5",
+  "version": "0.1.0",
   "author": {
     "name": "RED Medical Systems GmbH",
     "email": "info@redmedical.de",
