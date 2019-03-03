@@ -1,4 +1,4 @@
-pragma solidity >=0.4.22 <0.6.0;
+pragma solidity 0.5.0;
 
 contract AccountContract {
     function existsAccount(address _owner, bytes32 _nameHash) public view returns (bool);

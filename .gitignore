@@ -1,10 +1,11 @@
-.idea
-package-lock.json
-nohup.out
 .eth/nohup.out
+.idea
+.nyc_output
+.test
 coverage/
 coverage.lcov
-.nyc_output
-pid.txt
+eth/build/contracts/*Contract.json
 node_modules
-.test
+nohup.out
+package-lock.json
+pid.txt
