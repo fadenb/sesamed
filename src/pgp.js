@@ -109,7 +109,7 @@ async function encrypt(options) {
  * @returns {String} ciphertext - the deflated ciphertext
  */
 function deflateCiphertext(ciphertext) {
-    return ciphertext.replace(/(-----BEGIN PGP MESSAGE-----\r\nVersion: OpenPGP.js v4.4.7\r\nComment: https:\/\/openpgpjs.org\r\n\r\n|\r\n-----END PGP MESSAGE-----\r\n|\r\n)/g, "");
+    return ciphertext.replace(/(-----BEGIN PGP MESSAGE-----\r\nVersion: OpenPGP.js v4.4.\d\r\nComment: https:\/\/openpgpjs.org\r\n\r\n|\r\n-----END PGP MESSAGE-----\r\n|\r\n)/g, "");
 }
 /**
  * Decrypts data with private key and checks signature if public key is provided
