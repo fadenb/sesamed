@@ -21,15 +21,13 @@ contract Channel {
 
     event newChannelEvent (
         bytes32 indexed channelId,
-        string ciphertext,
-        string name
+        bytes32 nameHash,
+        string ciphertext
     );
 
-    function register(bytes32 _channelId, string memory _ciphertext, string memory _name) public returns (bool) {
-        bytes32 nameHash = keccak256(bytes(_name));
-
-        require(accountContract.existsAccount(msg.sender, nameHash));
+    function register(bytes32 _channelId, bytes32 _nameHash, string memory _ciphertext) public returns (bool) {
         require(!channel[_channelId].exists, "existsChannel");
+        require(accountContract.existsAccount(msg.sender, _nameHash));
 
         channelStruct memory newChannel;
         newChannel.owner = msg.sender;
@@ -38,8 +36,8 @@ contract Channel {
 
         emit newChannelEvent(
             _channelId,
-            _ciphertext,
-            _name
+            _nameHash,
+            _ciphertext
         );
 
         return true;

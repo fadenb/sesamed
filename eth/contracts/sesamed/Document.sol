@@ -14,17 +14,15 @@ contract Document {
 
     event newDocumentEvent (
         bytes32 indexed channelId,
-        string fileHash,
-        uint8 repo
+        bytes32 fileHash
     );
 
-    function send(bytes32 _channelId, string memory _fileHash, uint8 _repo) public returns (bool sucess) {
+    function send(bytes32 _channelId, bytes32 _fileHash) public returns (bool success) {
         require(channelContract.getChannelOwner(_channelId) == msg.sender, "notChannelOwner");
 
         emit newDocumentEvent (
             _channelId,
-            _fileHash,
-            _repo
+            _fileHash
         );
 
         return true;

@@ -2,13 +2,16 @@
   "name": "sesamed",
   "main": "src/sesamed.js",
   "scripts": {
-    "test": "npx nyc mocha",
-    "cover": "npx nyc --reporter=html --reporter=text mocha",
+    "test": "npx jasmine ",
+    "testCover": "npx nyc jasmine ",
+    "cover": "npx nyc --reporter=html --reporter=text jasmine",
     "compile": "cd eth && npx truffle compile",
+    "deploy": "cd eth && npx truffle migrate --network sesamed --reset",
     "codecov": "npx codecov ",
     "testContracts": "cd eth && sh waitForGanache.sh && npx truffle test test/contracts.test.js",
     "testSesamed": "cd eth && sh waitForGanache.sh && npx truffle test test/sesamed.si.test.js",
-    "lint": "npx eslint src test eth/migrations eth/test",
+    "testSesamedGeth": "cd eth && npx truffle test test/sesamed.si.test.js --network sesamed",
+    "lint": "npx eslint src spec spec/sesamed eth/migrations eth/test",
     "browserify": "npx browserify src/sesamed.js -o dist/sesamed.js",
     "release:major": "changelog -M && git add CHANGELOG.md && git commit -m 'updated CHANGELOG.md' && npm version major && git push origin && git push origin --tags",
     "release:minor": "changelog -m && git add CHANGELOG.md && git commit -m 'updated CHANGELOG.md' && npm version minor && git push origin && git push origin --tags",
@@ -44,9 +47,6 @@
   ],
   "devDependencies": {
     "browserify": "^16.2.3",
-    "chai": "^4.2.0",
-    "chai-as-promised": "^7.1.1",
-    "chai-spies": "^1.0.0",
     "codecov": "^3.2.0",
     "eslint": "^5.14.0",
     "eslint-config-standard": "^12.0.0",
@@ -56,14 +56,12 @@
     "eslint-plugin-standard": "^4.0.0",
     "ganache-cli": "^6.3.0",
     "generate-changelog": "^1.7.1",
+    "jasmine": "^3.3.1",
     "jsdoc-to-markdown": "^4.0.1",
-    "mocha": "^4.1.0",
     "mocha-logger": "^1.0.6",
     "nyc": "^13.3.0",
     "replace-in-file": "^3.4.3",
     "rewire": "^4.0.1",
-    "sinon": "^7.2.3",
-    "sinon-chai": "^3.3.0",
     "truffle": "^5.0.4",
     "truffle-assertions": "^0.8.0"
   },
@@ -72,7 +70,8 @@
     "base64-arraybuffer": "^0.1.5",
     "bs58": "^4.0.1",
     "ethers": "^4.0.25",
+    "go-ipfs": "^0.4.18-hacky2",
     "ipfs-mini": "^1.1.5",
-    "openpgp": "^4.4.7"
+    "openpgp": "4.4.7"
   }
 }

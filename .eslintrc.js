@@ -14,7 +14,10 @@ module.exports = {
         contract: true,
         assert: true,
         web3: true,
-        expect: true
+        expect: true,
+        expectAsync: true,
+        beforeEach: true,
+        jasmine: true
     },
     parserOptions: {
         ecmaVersion: 2018

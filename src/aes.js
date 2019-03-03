@@ -8,6 +8,10 @@ const base64ArrayBuffer = require("base64-arraybuffer");
  * @returns {Promise}
  * @resolve {String} key - a base64 encoded AES key
  * @reject {Error} - this should not happen
+ * @example
+ ```js
+ // example will follow
+ ```
  */
 async function generateKey() {
     let key = await crypto.subtle.generateKey(
@@ -32,6 +36,10 @@ async function generateKey() {
  * @returns {Promise}
  * @resolve {CryptoKey}
  * @reject {Error}
+ * @example
+ ```js
+ // example will follow
+ ```
  */
 async function importKey(key) {
     return crypto.subtle.importKey(
@@ -58,6 +66,10 @@ async function importKey(key) {
  * @returns {Promise}
  * @resolve {string} ciphertext - the base64 encoded ciphertext
  * @reject {Error}
+ * @example
+ ```js
+ // example will follow
+ ```
  */
 async function encrypt(key, cleartext) {
     let cryptoKey = await importKey(key);
@@ -87,6 +99,10 @@ async function encrypt(key, cleartext) {
  * @returns {Promise}
  * @resolve {String} ciphertext - the base64 encoded ciphertext
  * @reject {Error}
+ * @example
+ ```js
+ // example will follow
+ ```
  */
 async function decrypt(key, ciphertext) {
     let cipherBuff = base64ArrayBuffer.decode(ciphertext);
@@ -114,6 +130,10 @@ async function decrypt(key, ciphertext) {
  * @param {Uint8Array} b
  * @param {Uint8Array} c
  * @returns {Int8Array}
+ * @example
+ ```js
+ // example will follow
+ ```
  */
 function concatUint8Arrays(a, b, c) {
     var d = new Int8Array(a.length + b.length + c.length);

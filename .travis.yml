@@ -3,7 +3,11 @@ node_js:
   - 8.9.4
 script:
   - npm run lint
-  - npm test
+  - npm run testCover
   - npm run report-cover
-  - cd eth && npx ganache-cli > /dev/null 2>&1 &
-  - cd eth && sh waitForGanache.sh && npm run testContracts
+  - npx ipfs init
+  - npx ipfs daemon > /dev/null 2>&1 &
+  - npx ganache-cli > /dev/null 2>&1 &
+  - npm run testContracts
+  - npm run testSesamed
+

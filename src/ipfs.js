@@ -14,6 +14,10 @@ let ipfs;
  * sets the ipfs gateway
  * @alias module:"sesamed.ipfs".setGateway
  * @param {String} ipfsGateway
+ * @example
+ ```js
+ // example will follow
+ ```
  */
 function setGateway(ipfsGateway) {
     if (!ipfsGateway || typeof ipfsGateway !== "object") {
@@ -36,6 +40,10 @@ function setGateway(ipfsGateway) {
  * @returns {Promise}
  * @resolve {String} fileHash
  * @reject {Error}
+ * @example
+ ```js
+ // example will follow
+ ```
  */
 function write(data) {
     return ipfs.add(data);
@@ -50,6 +58,10 @@ function write(data) {
  * @returns {Promise}
  * @resolve {String} data - the data which has been read
  * @reject {Error}
+ * @example
+ ```js
+ // example will follow
+ ```
  */
 function read(fileHash) {
     return ipfs.cat(fileHash);

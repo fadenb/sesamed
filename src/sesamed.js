@@ -3,7 +3,7 @@
  */
 "use strict";
 // npm packages
-const ethers = require ("ethers");
+var ethers = require ("ethers");
 
 // local modules
 const pgp = require("./pgp");
@@ -26,18 +26,24 @@ const documentContractJson = contracts.documentContractJson;
  * @property {String} mnemonic - the mnemonic of the account
  * @property {String} address - the address of the account
  * @property {String} privateKey - the privateKey of the account
+ * @example
+ ```js
+ // example will follow
+ ```
  */
 
-
 /**
-*
-* @typedef {Object} UserIds
-* @alias UserIds
-* @memberof module:sesamed
-* @property {String} name - the account name
-* @property {String} [email] - the email of the account
-*/
-
+ *
+ * @typedef {Object} UserIds
+ * @alias UserIds
+ * @memberof module:sesamed
+ * @property {String} name - the account name
+ * @property {String} [email] - the email of the account
+ * @example
+ ```js
+ // example will follow
+ ```
+ */
 
 /**
  *
@@ -48,8 +54,11 @@ const documentContractJson = contracts.documentContractJson;
  * @property {String} path - the path of the mnemonic
  * @property {String} privateKey - the private key of the account
  * @property {String} address - the address of the account
+ * @example
+ ```js
+ // example will follow
+ ```
  */
-
 
 /**
  *
@@ -58,8 +67,11 @@ const documentContractJson = contracts.documentContractJson;
  * @memberof module:sesamed
  * @property {String} privateKey - the private pgp key
  * @property {String} publicKey - the public pgp key
+ * @example
+ ```js
+ // example will follow
+ ```
  */
-
 
 /**
  *
@@ -67,10 +79,13 @@ const documentContractJson = contracts.documentContractJson;
  * @alias IpfsGateway
  * @memberof module:sesamed
  * @property {String} host - the host address (i.e. "ipfs.infura.io")
- * @properry {Number} port - the gateway port (i.e. 5001)
+ * @property {Number} port - the gateway port (i.e. 5001)
  * @property {String} protocol - "https" / "http"
+ * @example
+ ```js
+ // example will follow
+ ```
  */
-
 
 /**
  *
@@ -79,8 +94,14 @@ const documentContractJson = contracts.documentContractJson;
  * @memberof module:sesamed
  * @property {String} channelId - the id of the channel
  * @property {String} aesKey - the AES key of the channel
- * @property {Object} [tx]- the transaction if channel was written
- * @property {Object} [receipt] - the receipt if channel was written and waitForReceipt:true
+ * @property {String} ciphertext - contains the encrypted aesKey and name (seperated by a space)
+ * @property {String} name - the name of the sender
+ * @property {String} nameHash - the hash of the name of the sender
+ * @property {Object} [receipt] - the receipt of the transaction
+ * @example
+ ```js
+ // example will follow
+ ```
  *
  */
 
@@ -90,13 +111,15 @@ const documentContractJson = contracts.documentContractJson;
  * @alias Document
  * @memberof module:sesamed
  * @property {String} channelId - the id of the channel the document came from
- * @property {String} fileHash - the hash of the encrypted document
- * @property {Number} repo - the repo the document is stored (at the moment repo:1 (ipfs) is fixed
+ * @property {String} fileHash - the hash of the encrypted document (digest of multihash)
  * @property {String} [aesKey] - the AES key of the channel can be temporarily part of the document
  * @property {String} data - the data of the document in cleartext
+ * @example
+ ```js
+ // example will follow
+ ```
  *
  */
-
 
 /**
  * Initializes the configuration
@@ -107,8 +130,16 @@ const documentContractJson = contracts.documentContractJson;
  * @param {String} [options.documentContractAddress] - the address of the document contract
  * @param {String} [options.rpcUrl] - the url of the rpc provider
  * @param {IpfsGateway} [options.ipfsGateway] - the ipfsGateway
+ * @example
+ ```js
+ // init without any options
+ sesamed.init();
+
+ // init with a different ipfsGateway
+ sesamed.init({ipfsGateway: {host: "ipfs.infura.io", port: 5001, protocol: "https"}});
+ ```
  */
-function init(options) {
+async function init(options) {
     options = options || {};
 
     // set the gateway for ipfs
@@ -118,22 +149,25 @@ function init(options) {
     global.provider = new ethers.providers.JsonRpcProvider(options.rpcUrl || global.default.rpcUrl);
 
     // get the current blocknumber at start up
-    global.startBlockNumber = global.provider.getBlockNumber();
+    global.blockNumber  = await global.provider.getBlockNumber();
 
+    // initialize the global cotracts object
+    global.contracts = {};
+    
     // define the account contract
     let accountContractAddress = options.accountContractAddress
         || accountContractJson.networks[global.default.network].address;
-    global.accountContract = new ethers.Contract(accountContractAddress, accountContractJson.abi, global.provider);
+    global.contracts.account = new ethers.Contract(accountContractAddress, accountContractJson.abi, global.provider);
 
     // define the channel contract
     let channelContractAddress = options.channelContractAddress
         || channelContractJson.networks[global.default.network].address;
-    global.channelContract = new ethers.Contract(channelContractAddress, channelContractJson.abi, global.provider);
+    global.contracts.channel = new ethers.Contract(channelContractAddress, channelContractJson.abi, global.provider);
 
     // define the document contract
     let documentContractAddress = options.documentContractAddress
         || documentContractJson.networks[global.default.network].address;
-    global.documentContract = new ethers.Contract(documentContractAddress, documentContractJson.abi, global.provider);
+    global.contracts.document = new ethers.Contract(documentContractAddress, documentContractJson.abi, global.provider);
 }
 
 
@@ -143,13 +177,9 @@ function init(options) {
  * @param {String} name - the name of the account
  * @returns {Account} account
  * @example
- * ```js
- * > sesamed.getNewAccount()
- * {
- *     wallet: {},
- *     pgp: {}
- * }
- * ```
+ ```js
+ sesamed.getNewAccount()
+ ```
  */
 async function getNewAccount(name) {
 
@@ -162,9 +192,12 @@ async function getNewAccount(name) {
 
     return {
         name: name,
+        nameHash: ethers.utils.id(name),
         mnemonic: wallet.mnemonic,
         address: wallet.address,
-        privateKey: pgpKeys.privateKey
+        passphrase: wallet.mnemonic,
+        privateKey: pgpKeys.privateKey,
+        publicKey: await pgp.getPublicKeyFromPrivateKey(pgpKeys.privateKey, wallet.mnemonic)
     };
 }
 
@@ -174,15 +207,19 @@ async function getNewAccount(name) {
  * @returns {Promise}
  * @resolve {Wallet}
  * @reject {Error}
+ * @example
+ ```js
+ // example will follow
+ ```
  */
-async function createWalletFromMnemonic(mnemonic) {
-    const newWallet = ethers.Wallet.fromMnemonic(mnemonic);
+function createWalletFromMnemonic(mnemonic) {
+    const wallet = ethers.Wallet.fromMnemonic(mnemonic);
 
     return {
-        mnemonic: newWallet.signingKey.mnemonic,
-        path: newWallet.signingKey.path,
-        privateKey: newWallet.signingKey.privateKey,
-        address: newWallet.signingKey.address,
+        mnemonic: wallet.signingKey.mnemonic,
+        path: wallet.signingKey.path,
+        privateKey: wallet.signingKey.privateKey,
+        address: wallet.signingKey.address,
     };
 }
 
@@ -191,8 +228,12 @@ async function createWalletFromMnemonic(mnemonic) {
  * @returns {Promise}
  * @resolve {String} mnemonic
  * @reject {Error}
+ * @example
+ ```js
+ // example will follow
+ ```
  */
-async function createMnemonic() {
+function createMnemonic() {
     return ethers.utils.HDNode.entropyToMnemonic(getRandomBytes(16));
 }
 
@@ -209,6 +250,10 @@ function getRandomBytes(n) {
  * sets an account to be used by sesamed
  * @alias module:sesamed.setAccount
  * @param {Account} account
+ * @example
+ ```js
+ // example will follow
+ ```
  */
 async function setAccount(account) {
     if (!account || typeof account !== "object"
@@ -222,40 +267,38 @@ async function setAccount(account) {
     // create the wallet
     let wallet = await createWalletFromMnemonic(account.mnemonic);
     wallet = new ethers.Wallet(wallet.privateKey, global.provider);
-
     // get contract with signer (wallet)
-    global.accountContract = global.accountContract.connect(wallet);
-    global.channelContract = global.channelContract.connect(wallet);
-    global.documentContract = global.documentContract.connect(wallet);
+    global.contracts = {
+        account: global.contracts.account.connect(wallet),
+        channel: global.contracts.channel.connect(wallet),
+        document: global.contracts.document.connect(wallet)
+    };
 
-    // create the pgp keys
-    global.privateKey = account.privateKey;
-    global.passphrase = account.mnemonic;
-    global.publicKey = await pgp.getPublicKeyFromPrivateKey(global.privateKey, account.mnemonic);
-
-    // set account name
-    global.name = account.name;
+    // set the account
+    global.account = account;
 }
 
 /**
  * Registers a new account
  * @alias module:sesamed.register
- * @param {boolean} [waitForReceipt] - if true the receipt is returned else the transaction
  * @returns {Promise}
- * @resolve {Object} returns the transaction or the receipt depending on waitForReceipt
+ * @resolve {Object} returns the receipt
  * @reject {Error}
+ * @example
+ ```js
+ // example will follow
+ ```
  */
-async function registerAccount(waitForReceipt) {
-    if (!global.name) {
+async function registerAccount() {
+    if (!global.account.name) {
         throw(new Error("registerAccount: no account set - use setAccount before"));
     }
-    let ipfsHash = await ipfs.write(global.publicKey);
 
-    let tx = await global.accountContract.register(global.name, ipfsHash, global.default.repo);
+    let ipfsHash = await ipfs.write(global.account.publicKey);
+    let fileHash = multihash.getMultihashFromBase58(ipfsHash).digest;
 
-    if (!waitForReceipt) {
-        return tx;
-    }
+    let tx = await global.contracts.account.register(global.account.nameHash, fileHash, {gasLimit: 150000});
+
     return await global.provider.waitForTransaction(tx.hash);
 }
 
@@ -267,18 +310,22 @@ async function registerAccount(waitForReceipt) {
  * @returns {Promise}
  * @resolve {String} publicKey
  * @reject {Error}
+ * @example
+ ```js
+ // example will follow
+ ```
  */
 async function getPublicKey(name) {
-    if (!global.name) {
+    if (!global.account.name) {
         throw(new Error("registerAccount: no account set - use setAccount before"));
     }
 
     let accounts = await getLogEntries(
         0,
         "latest",
-        global.accountContract.address,
+        global.contracts.account.address,
         "newAccountEvent",
-        ["bytes32","string","uint8"],
+        ["bytes32","bytes32"],
         ethers.utils.id(name)
     );
 
@@ -290,8 +337,9 @@ async function getPublicKey(name) {
         throw (new Error("getPublicKey: multiple accounts found"));
     }
 
-    let fileHash = accounts[0].data[0];
-    let publicKey = await ipfs.read(fileHash);
+    let fileHash = accounts[0].dataArr[0];
+    let ipfsHash = multihash.getBase58FromMultihash(fileHash);
+    let publicKey = await ipfs.read(ipfsHash);
 
     return publicKey;
 }
@@ -307,19 +355,28 @@ async function getPublicKey(name) {
  * @returns {Promise}
  * @resolve {Object[]} entries - the log entries
  * @reject {Error}
+ * @example
+ ```js
+ // example will follow
+ ```
  */
 function getLogEntries(from, to, contractAddress, eventName, params, topic) {
+    let topics = [
+        ethers.utils.id(eventName + "(" + params.join(",") + ")"),
+    ];
+
+    if (topic) {
+        topics.push(topic);
+    }
+
     var filter = {
             fromBlock: from,
             toBlock: to,
             address: contractAddress,
-            topics: [
-                ethers.utils.id(eventName + "(" + params.join(",") + ")"),
-                topic
-            ]
+            topics: topics
         },
         decodeData = async function (item) {
-            item.data = ethers.utils.defaultAbiCoder.decode(
+            item.dataArr = ethers.utils.defaultAbiCoder.decode(
                 params.slice(1),
                 item.data
             );
@@ -331,18 +388,20 @@ function getLogEntries(from, to, contractAddress, eventName, params, topic) {
     });
 }
 
-
 /**
  * registers a new channel on the blockchain and returns the new channel
  * @alias module:sesamed.registerChannel
  * @param {String|String[]} recipients - the names of the recipients
- * @param {Bool} [waitForReceipt] if true the returned channel contains a property "receipt"
  * @returns {Promise}
- * @resolve {Channel}
+ * @resolve {Channel} the new Channel - consists of an additional property "receipt"
  * @reject {Error}
+ * @example
+ ```js
+ // example will follow
+ ```
  */
-async function registerChannel(recipients, waitForReceipt) {
-    if (!global.name) {
+async function registerChannel(recipients) {
+    if (!global.account.name) {
         throw(new Error("registerAccount: no account set - use setAccount before"));
     }
 
@@ -364,12 +423,12 @@ async function registerChannel(recipients, waitForReceipt) {
     // get the aes key
     let aesKey = await aes.generateKey();
 
-    // encrypt the aes key with the public keys of the recipients
-    let aesKeyEncrypted = await pgp.encrypt({
+    // encrypt the aes key and the name with the public keys of the recipients
+    let ciphertext = await pgp.encrypt({
         publicKey: publicKeys,
-        privateKey: global.privateKey,
-        passphrase: global.passphrase,
-        cleartext: aesKey
+        privateKey: global.account.privateKey,
+        passphrase: global.account.passphrase,
+        cleartext: aesKey + " " + global.account.name
     });
 
     let channelId = ethers.utils.id(aesKey);
@@ -379,69 +438,83 @@ async function registerChannel(recipients, waitForReceipt) {
         aesKey: aesKey
     };
 
-    let tx = await global.channelContract.register(channelId, aesKeyEncrypted, global.name);
-    channel.tx = tx;
+    let tx = await global.contracts.channel.register(channelId, global.account.nameHash, ciphertext, {gasLimit: 150000});
+    channel.receipt = await global.provider.waitForTransaction(tx.hash);
 
-    if (waitForReceipt) {
-        channel.receipt = await global.provider.waitForTransaction(tx.hash);
-    }
     return channel;
 }
 
 /**
- * gets all new channels for the current account since startup
- * @alias module:sesamed.getNewAccountChannels
+ * gets all new channels for the current account since the given start block
+ * @alias module:sesamed.getChannels
+ * @param {Number} [startBlockNumber] - the block number to start with (default: 0)
  * @returns {Promise}
  * @resolve {Channel[]}
  * @reject {Error}
+ * @example
+ ```js
+ // example will follow
+ ```
  */
-async function getNewAccountChannels() {
+async function getChannels (startBlockNumber) {
+    let from = (startBlockNumber > global.startBlockNumber ? startBlockNumber : global.startBlockNumber);
     let events = await getLogEntries(
-        global.startBlockNumber,
+        from,
         "latest",
-        global.channelContract.address,
+        global.contracts.channel.address,
         "newChannelEvent",
-        ["bytes32", "string", "string"]
+        ["bytes32", "bytes32", "string"]
     );
 
-    let encryptedChannels = events.map(event => {
-        return {
-            channelId: event.topics[1],
-            aesKeyEncrypted: event.data[0],
-            name: event.data[1]
-        };
-    });
+    let encryptedChannels = events.map(mapEventToChannel);
 
-    return await filterAccountChannels(encryptedChannels);
+    return await filterAndDecryptAccountChannels(encryptedChannels);
 }
 
+function mapEventToChannel (event) {
+    return {
+        channelId: event.topics[1],
+        nameHash: event.dataArr[0],
+        ciphertext: event.dataArr[1],
+    };
+}
 
 /**
  *
  * @typedef {Object} EncryptedChannel
  * @alias EncryptedChannel
  * @property {String} channelId - the id of the channel
- * @properry {String} aesKeyEncrypted - the encrypted AES key of the channel
+ * @properry {String} ciphertext - the encrypted AES key of the channel
+ * @example
+ ```js
+ // example will follow
+ ```
  */
-
 
 /**
  * filtes out all channels for the current account
- * @param {EncryptedChannel[]} encryptedChannels
+ * @param {Channel[]} channels
  * @returns {Promise}
  * @resolve {Channel[]}
  * @reject {Error}
  */
-async function filterAccountChannels(encryptedChannels) {
-    return encryptedChannels.reduce(async function(prevPromise, encryptedChannel) {
+async function filterAndDecryptAccountChannels(channels) {
+    return channels.reduce(async function(prevPromise, channel) {
         let accountChannels = await prevPromise;
         await pgp.decrypt({
-            privateKey: global.privateKey,
-            passphrase: global.passphrase,
-            ciphertext: encryptedChannel.aesKeyEncrypted
-        }).then(aesKey => {
-            encryptedChannel.aesKey = aesKey;
-            accountChannels.push(encryptedChannel);
+            privateKey: global.account.privateKey,
+            passphrase: global.account.passphrase,
+            ciphertext: channel.ciphertext
+        }).then(cleartext => {
+            // cleartext = aesKey + " " + name
+            let cleartextArr = cleartext.split(" ");
+            channel.aesKey = cleartextArr[0];
+            channel.name = cleartextArr[1];
+
+            // check if name and nameHash fit
+            checkChannelNameHash(channel);
+
+            accountChannels.push(channel);
         }).catch(() => {
             // do nothing
         });
@@ -449,41 +522,56 @@ async function filterAccountChannels(encryptedChannels) {
     }, Promise.resolve([]));
 }
 
+
+/**
+ * returns if channel.nameHash equals the hash of channel.name
+ * @param {Channel} channel - the channel to be checked
+ * @returns {boolean}
+ */
+function checkChannelNameHash(channel) {
+    return ethers.utils.id(channel.name) !== channel.nameHash;
+}
+
 /**
  * sends a document into a channel
  * @alias module:sesamed.sendDocument
  * @param {Channel} channel - the channel to which the document should be sent
  * @param {String } document - the document to be sent
- * @param {Bool} [waitForReceipt] if true the receipt os returned else the the transaction
  * @returns {Promise}
- * @resolve {Objcect} the transaction or the receipt depending on waitForReceipt
+ * @resolve {Object} the receipt of the transaction
+ * @example
+ ```js
+ // example will follow
+ ```
  */
-async function sendDocument(channel, document, waitForReceipt) {
+async function sendDocument(channel, document) {
     let encDoc = await aes.encrypt(channel.aesKey, document);
     let ipfsHash = await ipfs.write(encDoc);
-    let tx = await global.documentContract.send(channel.channelId, ipfsHash, global.default.repo);
-    if (!waitForReceipt) {
-        return tx;
-    }
+    let fileHash = multihash.getMultihashFromBase58(ipfsHash).digest;
+    let tx = await global.contracts.document.send(channel.channelId, fileHash, {gasLimit: 150000});
     return await global.provider.waitForTransaction(tx.hash);
 }
 
 /**
- * gets all documents from the givens channels
+ * gets all documents from the givens channels starting with the given blocknumber
  * @param {Channel[]} channels - an array of the channels to get the documents from
+ * @param {Number} [startBlockNumber] - the blocknumber to start with  (default: from contractStart)
  * @returns {Promise}
  * @resolve {Documents[]} the documents
  * @reject {Error}
  */
-async function getDocuments(channels) {
-    let channelsObj = convertChannelsToObject(channels);
+async function getDocuments(channels, startBlockNumber) {
+    if (channels.length === 0) {
+        return [];
+    }
 
+    let channelsObj = convertChannelsToObject(channels);
     let events = await getLogEntries(
-        global.startBlockNumber,
+        startBlockNumber || global.startBlockNumber,
         "latest",
-        global.documentContract.address,
+        global.contracts.document.address,
         "newDocumentEvent",
-        ["bytes32", "string", "uint8"],
+        ["bytes32", "bytes32"],
         Object.keys(channelsObj)
     );
 
@@ -499,7 +587,6 @@ async function getDocuments(channels) {
     return documentsWithDataWithoutKey;
 }
 
-
 /**
  * maps an event to a document
  * @param {Object} channelsObj - the channelsObject containing the aesKeys of the channels
@@ -511,8 +598,7 @@ function mapEventsToDocuments (channelsObj, event) {
 
     return {
         channelId: channelId,
-        fileHash: event.data[0],
-        repo: event.data[1],
+        fileHash: event.dataArr[0],
         aesKey: channelsObj[channelId].aesKey
     };
 }
@@ -538,6 +624,10 @@ function convertChannelsToObject(channels) {
  * @alias module:sesamed.convertChannelsToArray
  * @param  {Object} channelsObj - {channelId1: {...}, channelId2, {...}, ...}
  * @returns {Channel[]} channels
+ * @example
+ ```js
+ // example will follow
+ ```
  */
 function convertChannelsToArray(channelsObj) {
     let channelId;
@@ -549,7 +639,6 @@ function convertChannelsToArray(channelsObj) {
     return channels;
 }
 
-
 /**
  * gets the documents from ipfs and puts the decrypted data into the data property of the channels
  * @param {Documents[]} documentsWithKey
@@ -559,14 +648,29 @@ function convertChannelsToArray(channelsObj) {
  */
 async function getDocumentsFromIpfs(documentsWithKey) {
     return Promise.all(documentsWithKey.map(async documentWithKey => {
-        let encData = await ipfs.read(documentWithKey.fileHash);
+        let ipfsHash = multihash.getBase58FromMultihash(documentWithKey.fileHash);
+        let encData = await ipfs.read(ipfsHash);
         let data = await aes.decrypt(documentWithKey.aesKey, encData);
         documentWithKey.data = data;
         return documentWithKey;
     }));
 }
 
-
+/**
+ * returns the current block number
+ * @alias module:sesamed.getBlockNumber
+ * @returns {Promise}
+ * @resolve {Number} the current block number
+ * @example
+ ```js
+ sesamed.getBlockNumber().then((blockNumber) => {
+     console.log("Current block number: " + blockNumber);
+ });
+ ```
+ */
+async function getBlockNumber() {
+    return await global.provider.getBlockNumber();
+}
 
 var sesamed = {
     init: init,
@@ -575,17 +679,16 @@ var sesamed = {
     registerAccount: registerAccount,
     getPublicKey: getPublicKey,
     registerChannel: registerChannel,
-    getNewAccountChannels: getNewAccountChannels,
+    getChannels: getChannels,
     sendDocument: sendDocument,
     getDocuments: getDocuments,
     convertChannelsToArray: convertChannelsToArray,
     convertChannelsToObject: convertChannelsToObject,
+    getBlockNumber: getBlockNumber,
     pgp: pgp,
     aes: aes,
     ipfs: ipfs,
     multihash: multihash,
-    // for testing only
-    _ethers: ethers
 };
 
 if (typeof window !== "undefined") {
