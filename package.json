@@ -21,7 +21,7 @@
     "testSesamed": "cd eth && sh waitForGanache.sh && npx truffle test test/sesamed.si.test.js",
     "testSesamedGeth": "cd eth && npx truffle test test/sesamed.si.test.js --network sesamed"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": {
     "name": "RED Medical Systems GmbH",
     "email": "info@redmedical.de",
